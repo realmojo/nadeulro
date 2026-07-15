@@ -1,49 +1,31 @@
 import Link from "next/link";
-import { Flag, Waves, Mountain, BedDouble, Route, ArrowRight } from "lucide-react";
+import { ArrowRight, MapPinned, Navigation, PhoneCall } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { fetchPlaces } from "@/lib/places-server";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+  CATEGORIES,
+  CATEGORY_ORDER,
+  type PlaceCategory,
+} from "@/lib/places";
 import { siteConfig } from "@/lib/site";
 
-const categories = [
-  {
-    title: "파크골프",
-    href: "/parkgolf",
-    icon: Flag,
-    role: "간판",
-    desc: "전국 파크골프장을 지도에서 한눈에. 거리·홀수로 골라보세요.",
-  },
-  {
-    title: "온천",
-    href: "/onsen",
-    icon: Waves,
-    role: "휴식",
-    desc: "라운딩 뒤 몸을 풀어주는 근처 온천을 코스에 넣어요.",
-  },
-  {
-    title: "등산",
-    href: "/guide",
-    icon: Mountain,
-    role: "자연",
-    desc: "가볍게 걷기 좋은 자연·건강 코스로 이어집니다.",
-  },
-  {
-    title: "숙박",
-    href: "/stay",
-    icon: BedDouble,
-    role: "1박",
-    desc: "온천·여행과 묶어 여유로운 1박 코스로 완성해요.",
-  },
-];
+/** 장소 수는 천천히 변한다 — 1시간 재생성 */
+export const revalidate = 3600;
 
-export default function Home() {
+export default async function Home() {
+  let counts: Record<PlaceCategory, number> = {
+    parkgolf: 0,
+    hotspring: 0,
+    swim: 0,
+    hiking: 0,
+  };
+  try {
+    counts = (await fetchPlaces()).counts;
+  } catch {
+    /* 카운트 실패 시에도 페이지는 뜬다 */
+  }
+  const total = CATEGORY_ORDER.reduce((s, c) => s + counts[c], 0);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -60,93 +42,230 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero */}
-      <section className="border-b bg-gradient-to-b from-accent/40 to-background">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <Badge variant="secondary" className="mb-5 text-base">
-            신청년을 위한 나들이 코스
-          </Badge>
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">
-            {siteConfig.tagline}
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            파크골프 · 온천 · 등산 · 숙박을 하나의 하루 코스로 잇습니다. 오늘,
-            가까운 곳에서 시작해 보세요.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link href="/parkgolf">
-                파크골프장 찾기
-                <ArrowRight aria-hidden="true" />
+      {/* ============ 히어로 ============ */}
+      <section className="bg-topo relative overflow-hidden border-b">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-[1.05fr_0.95fr] md:py-24">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-accent/70 px-4 py-1.5 text-base font-semibold text-accent-foreground">
+              전국 {total > 0 ? `${total.toLocaleString()}곳` : "3,000여 곳"}, 지도 한 장에
+            </p>
+            <h1 className="font-display mt-5 text-4xl font-bold leading-[1.22] tracking-tight md:text-6xl md:leading-[1.18]">
+              지도 한 장이면,
+              <br />
+              오늘 나들이 준비 끝.
+            </h1>
+            <p className="mt-5 max-w-xl break-keep text-lg leading-relaxed text-muted-foreground md:text-xl">
+              파크골프장 · 온천 · 수영장의 실제 위치와 정보를 한 지도에
+              모았습니다. 가까운 곳을 고르고, 전화 한 통이면 준비 끝.
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link
+                href="/map"
+                className="inline-flex min-h-14 items-center gap-2.5 rounded-2xl bg-persimmon px-7 text-xl font-bold text-persimmon-foreground shadow-md transition-transform hover:brightness-105 active:scale-[0.98]"
+              >
+                <MapPinned className="size-6" />
+                나들이 지도 열기
               </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/course">코스 묶음 보기</Link>
-            </Button>
+              <Link
+                href="/parkgolf"
+                className="inline-flex min-h-14 items-center gap-2 rounded-2xl border-2 border-primary/30 bg-card px-6 text-lg font-semibold text-primary transition-colors hover:bg-accent"
+              >
+                파크골프장부터 보기
+                <ArrowRight className="size-5" />
+              </Link>
+            </div>
           </div>
+
+          {/* 미니 지도 일러스트 — 로고의 '길' 모티브 확장 */}
+          <HeroMapCard total={total} />
         </div>
       </section>
 
-      {/* 차별화 포인트: 코스 묶음 */}
-      <section className="mx-auto max-w-6xl px-4 py-14">
-        <Card className="bg-primary text-primary-foreground">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Route className="size-7" aria-hidden="true" />
-              <CardTitle className="text-2xl text-primary-foreground">
-                하나의 코스로 잇습니다
-              </CardTitle>
-            </div>
-            <CardDescription className="text-primary-foreground/80">
-              디렉터리 나열이 아니라, 하루의 흐름을 코스로 제안합니다.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg leading-relaxed">
-              ○○ 파크골프장에서 18홀 →{" "}
-              <span className="font-semibold">차로 15분</span> → △△온천에서 휴식
-              → 근처 □□ 맛집·숙박까지.
-            </p>
-            <Button asChild variant="secondary" className="mt-6">
-              <Link href="/course">
-                오늘의 코스 보기
-                <ArrowRight aria-hidden="true" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* 카테고리 */}
-      <section className="mx-auto max-w-6xl px-4 pb-20">
-        <h2 className="mb-6 text-2xl font-bold">무엇을 하러 나갈까요?</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((c) => {
-            const Icon = c.icon;
+      {/* ============ 카테고리 타일 ============ */}
+      <section className="mx-auto max-w-6xl px-4 py-14 md:py-18">
+        <h2 className="font-display text-3xl font-bold">
+          어디로 나갈까요?
+        </h2>
+        <p className="mt-2 text-lg text-muted-foreground">
+          숫자는 지금 지도에 올라와 있는 실제 장소 수예요.
+        </p>
+        <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {CATEGORY_ORDER.map((key) => {
+            const c = CATEGORIES[key];
+            const n = counts[key];
+            const ready = n > 0;
             return (
               <Link
-                key={c.title}
-                href={c.href}
-                className="group rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                key={key}
+                href={c.path}
+                className="group relative overflow-hidden rounded-2xl border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
               >
-                <Card className="h-full transition-colors group-hover:border-primary group-hover:bg-accent/40">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <Icon
-                        className="size-8 text-primary"
-                        aria-hidden="true"
-                      />
-                      <Badge variant="outline">{c.role}</Badge>
-                    </div>
-                    <CardTitle className="mt-2">{c.title}</CardTitle>
-                    <CardDescription>{c.desc}</CardDescription>
-                  </CardHeader>
-                </Card>
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-1.5"
+                  style={{ backgroundColor: c.color }}
+                />
+                <span
+                  className="flex size-13 items-center justify-center rounded-2xl"
+                  style={{ backgroundColor: `${c.color}1f` }}
+                >
+                  <svg viewBox="0 0 24 24" className="size-7" aria-hidden="true">
+                    <path d={c.glyph} fill={c.color} />
+                  </svg>
+                </span>
+                <p className="mt-4 text-xl font-bold">{c.label}</p>
+                <p className="font-display mt-1 text-3xl font-bold" style={{ color: c.color }}>
+                  {ready ? `${n.toLocaleString()}곳` : "준비 중"}
+                </p>
+                <p className="mt-2 break-keep text-base leading-relaxed text-muted-foreground">
+                  {c.blurb}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1 text-base font-semibold text-primary">
+                  지도에서 보기
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                </span>
               </Link>
             );
           })}
         </div>
       </section>
+
+      {/* ============ 사용 방법 ============ */}
+      <section className="border-y bg-secondary/50">
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-18">
+          <h2 className="font-display text-3xl font-bold">
+            쓰는 법은 세 걸음이면 충분해요
+          </h2>
+          <div className="relative mt-8 grid gap-6 md:grid-cols-3">
+            {/* 연결 점선 (PC) */}
+            <span
+              aria-hidden="true"
+              className="route-line absolute left-[12%] right-[12%] top-10 hidden text-primary/40 md:block"
+              style={{ height: 3 }}
+            />
+            {[
+              {
+                icon: <MapPinned className="size-8" />,
+                title: "지도를 연다",
+                desc: "전국 지도를 열고 우리 동네로 이동해요. ‘내 주변’ 버튼이면 한 번에.",
+              },
+              {
+                icon: <Navigation className="size-8" />,
+                title: "가까운 곳을 고른다",
+                desc: "파크골프·온천·수영장 중 오늘 기분에 맞는 곳을 골라요. 홀수·수온까지 미리 확인.",
+              },
+              {
+                icon: <PhoneCall className="size-8" />,
+                title: "전화하고 나선다",
+                desc: "전화하기·길찾기 버튼이 큼직하게 붙어 있어요. 확인하고 바로 출발.",
+              },
+            ].map((s, i) => (
+              <div
+                key={s.title}
+                className="relative rounded-2xl border bg-card p-6 shadow-sm"
+              >
+                <div className="flex items-center gap-4">
+                  <span className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md">
+                    {s.icon}
+                  </span>
+                  <span className="font-display text-4xl font-bold text-primary/25">
+                    {i + 1}
+                  </span>
+                </div>
+                <p className="mt-4 text-xl font-bold">{s.title}</p>
+                <p className="mt-2 break-keep text-base leading-relaxed text-muted-foreground">
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ 마감 CTA ============ */}
+      <section className="bg-topo bg-primary">
+        <div className="mx-auto max-w-6xl px-4 py-16 text-center md:py-20">
+          <h2 className="font-display text-3xl font-bold text-primary-foreground md:text-4xl">
+            오늘은 어디로 나들이 갈까요?
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl break-keep text-lg leading-relaxed text-primary-foreground/85">
+            좋은 계절은 기다려 주지 않아요. 가까운 곳부터 가볍게 다녀오세요.
+          </p>
+          <Link
+            href="/map"
+            className="mt-8 inline-flex min-h-14 items-center gap-2.5 rounded-2xl bg-persimmon px-8 text-xl font-bold text-persimmon-foreground shadow-lg transition-transform hover:brightness-105 active:scale-[0.98]"
+          >
+            <MapPinned className="size-6" />
+            지도 열기
+          </Link>
+        </div>
+      </section>
     </>
+  );
+}
+
+/* 히어로 우측: 지도 카드 일러스트 (SDK 없이 가볍게) */
+function HeroMapCard({ total }: { total: number }) {
+  const pins: Array<{ cat: PlaceCategory; top: string; left: string; delay: string }> = [
+    { cat: "parkgolf", top: "22%", left: "18%", delay: "0s" },
+    { cat: "hotspring", top: "38%", left: "62%", delay: "0.15s" },
+    { cat: "swim", top: "64%", left: "34%", delay: "0.3s" },
+    { cat: "parkgolf", top: "72%", left: "74%", delay: "0.45s" },
+  ];
+  return (
+    <div className="relative mx-auto hidden w-full max-w-md md:block" aria-hidden="true">
+      <div className="bg-topo relative aspect-[4/5] overflow-hidden rounded-3xl border-2 border-primary/15 bg-card shadow-xl">
+        {/* 코스 점선 */}
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox="0 0 400 500"
+          fill="none"
+        >
+          <path
+            d="M86 132 C 150 190 240 150 262 216 C 282 276 160 300 150 342 C 142 378 220 400 300 382"
+            stroke="var(--primary)"
+            strokeOpacity="0.45"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray="2 14"
+          />
+        </svg>
+        {pins.map((p, i) => {
+          const m = CATEGORIES[p.cat];
+          return (
+            <span
+              key={i}
+              className="absolute flex size-12 -translate-x-1/2 -translate-y-full flex-col items-center animate-bounce"
+              style={{
+                top: p.top,
+                left: p.left,
+                animationDuration: "2.6s",
+                animationDelay: p.delay,
+              }}
+            >
+              <span
+                className="flex size-10 items-center justify-center rounded-full border-[3px] border-white shadow-lg"
+                style={{ backgroundColor: m.color }}
+              >
+                <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
+                  <path d={m.glyph} fill="white" />
+                </svg>
+              </span>
+              <span
+                className="-mt-[3px] size-2.5 rotate-45 border-b-[3px] border-r-[3px] border-white"
+                style={{ backgroundColor: m.color }}
+              />
+            </span>
+          );
+        })}
+        {/* 하단 요약 바 */}
+        <div className="absolute inset-x-4 bottom-4 flex items-center justify-between rounded-2xl border bg-background/95 px-5 py-3.5 shadow-md backdrop-blur">
+          <span className="text-base font-bold">이 지역 나들이 스팟</span>
+          <span className="font-display text-xl font-bold text-primary">
+            {(total || 3078).toLocaleString()}곳
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

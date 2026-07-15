@@ -1,0 +1,21 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="나들로">
+  <defs>
+    <linearGradient id="nadeulroTile" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3BB06C"/>
+      <stop offset="1" stop-color="#1C7645"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#nadeulroTile)"/>
+  <!-- 코스: 정거장 점을 지나 목적지 핀으로 이어지는 길 -->
+  <path d="M17 47 C 24 45 28 42 31 36 C 34 30 40 32 45 33"
+        stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- 출발 정거장 -->
+  <circle cx="17" cy="47" r="4.4" fill="#FFFFFF"/>
+  <circle cx="17" cy="47" r="1.9" fill="#1C7645"/>
+  <!-- 경유 정거장 -->
+  <circle cx="31" cy="36" r="3.4" fill="#FFFFFF"/>
+  <circle cx="31" cy="36" r="1.4" fill="#1C7645"/>
+  <!-- 목적지 핀 -->
+  <path d="M45 34 C 39.5 26.5 37.5 24 37.5 20.5 a7.5 7.5 0 1 1 15 0 C 52.5 24 50.5 26.5 45 34 Z" fill="#FFFFFF"/>
+  <circle cx="45" cy="20.2" r="2.9" fill="#1C7645"/>
+</svg>

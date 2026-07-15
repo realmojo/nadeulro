@@ -6,9 +6,9 @@ import {
 export const revalidate = 3600;
 
 export async function generateMetadata() {
-  return categoryMetadata("parkgolf");
+  return categoryMetadata("swim");
 }
 
-export default function ParkgolfPage() {
-  return <CategoryMapPage category="parkgolf" />;
+export default function SwimPage() {
+  return <CategoryMapPage category="swim" />;
 }

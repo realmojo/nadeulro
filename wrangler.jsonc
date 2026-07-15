@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nadeulro",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // 배포 시 Cloudflare 대시보드에서 설정한 환경 변수/시크릿을 삭제하지 않음.
+  // (wrangler deploy 는 이 파일을 설정 원본으로 보고 여기 없는 변수를 지운다)
+  "keep_vars": true,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "observability": {
+    "enabled": true,
+  },
+}
