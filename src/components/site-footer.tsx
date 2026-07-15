@@ -17,10 +17,11 @@ export function SiteFooter() {
   ];
 
   const subLinks = [
-    { title: "나들로 소개", href: "/" },
+    { title: "나들로 소개", href: "/about" },
     { title: "입문 가이드", href: "/guide" },
-    { title: "코스 묶음", href: "/course" },
-    { title: "문의하기", href: `mailto:${siteConfig.contactEmail}` },
+    { title: "문의하기", href: "/contact" },
+    { title: "개인정보처리방침", href: "/privacy" },
+    { title: "이용약관", href: "/terms" },
   ];
 
   return (

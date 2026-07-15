@@ -17,17 +17,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/guide",
     "/course",
     "/stay",
+    "/about",
+    "/contact",
+    "/privacy",
+    "/terms",
   ];
+
+  const lowPriority = ["/privacy", "/terms", "/contact"];
 
   const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${siteConfig.url}${route === "/" ? "" : route}`,
-    changeFrequency: "weekly",
+    changeFrequency: lowPriority.includes(route) ? "yearly" : "weekly",
     priority:
       route === "/"
         ? 1
         : ["/map", "/parkgolf", "/hotspring", "/swim", "/hiking"].includes(route)
           ? 0.9
-          : 0.7,
+          : lowPriority.includes(route)
+            ? 0.3
+            : 0.7,
   }));
 
   // 장소 상세 페이지(name 기반) 전체 포함
