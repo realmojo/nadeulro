@@ -50,6 +50,28 @@ function CATEGORY_LABEL(filter: Filter): string {
   return filter === "all" ? "전국 나들이 스팟을" : `${CATEGORIES[filter].label}을`;
 }
 
+type PlacesData = { places: Place[]; counts: Record<PlaceCategory, number> };
+
+/**
+ * 장소 데이터 모듈 캐시 — 카테고리 라우트를 오가며 MapScreen 이 리마운트돼도
+ * 같은 세션에서는 /api/places 를 다시 받지 않는다.
+ */
+let placesCache: Promise<PlacesData> | null = null;
+
+function loadPlacesOnce(): Promise<PlacesData> {
+  if (!placesCache) {
+    placesCache = fetch("/api/places")
+      .then((r) =>
+        r.ok ? (r.json() as Promise<PlacesData>) : Promise.reject(new Error(String(r.status)))
+      )
+      .catch((e) => {
+        placesCache = null; // 실패는 캐시하지 않음 → 다음 진입 때 재시도
+        throw e;
+      });
+  }
+  return placesCache;
+}
+
 export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
   /* ---------- 데이터 ---------- */
   const [places, setPlaces] = useState<Place[] | null>(null);
@@ -105,12 +127,11 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
     }
   }, [filter]);
 
-  /* ---------- 데이터 로드 ---------- */
+  /* ---------- 데이터 로드 (세션 내 1회 — 카테고리 이동 시 재다운로드 방지) ---------- */
   useEffect(() => {
     let alive = true;
-    fetch("/api/places")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((d: { places: Place[]; counts: Record<PlaceCategory, number> }) => {
+    loadPlacesOnce()
+      .then((d) => {
         if (!alive) return;
         setPlaces(d.places);
         setCounts(d.counts);
