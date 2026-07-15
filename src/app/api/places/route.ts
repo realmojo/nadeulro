@@ -10,7 +10,9 @@ export async function GET() {
     const payload = await fetchPlaces();
     return NextResponse.json(payload, {
       headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        /* 브라우저 10분 + CDN 1시간 캐시 — 새로고침·재방문 시 재다운로드 방지 */
+        "Cache-Control":
+          "public, max-age=600, s-maxage=3600, stale-while-revalidate=86400",
       },
     });
   } catch (e) {
