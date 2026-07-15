@@ -10,8 +10,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * 호출해야 하므로, 모듈 로드 시점이 아니라 호출 시점에 env 를 읽어야 한다.
  */
 export function createAdminClient(): SupabaseClient {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const clean = (v: string | undefined) =>
+    (v ?? "").trim().replace(/^["']+|["']+$/g, "");
+  const url = clean(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const key = clean(process.env.SUPABASE_SERVICE_ROLE_KEY);
   if (!url || !key) {
     throw new Error(
       "Supabase 환경변수가 없습니다: NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY",

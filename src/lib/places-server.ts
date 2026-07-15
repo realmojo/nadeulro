@@ -28,9 +28,14 @@ const LIST_ATTR_KEYS = [
   "image",
 ] as const;
 
+/** 대시보드 입력 실수 방어 — 양끝 공백·따옴표 제거 */
+function cleanEnv(v: string | undefined): string {
+  return (v ?? "").trim().replace(/^["']+|["']+$/g, "");
+}
+
 function makeClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const key = cleanEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   if (!url || !key) {
     throw new Error("Supabase 환경변수(NEXT_PUBLIC_SUPABASE_URL/ANON_KEY)가 없습니다");
   }
