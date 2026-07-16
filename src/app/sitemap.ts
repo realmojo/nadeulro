@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { blogPostPath } from "@/lib/blog";
+import { fetchAllPublished } from "@/lib/blog-server";
 import { placeDetailPath, regionPath } from "@/lib/places";
 import { fetchPlaces } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
@@ -21,6 +23,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/contact",
     "/privacy",
     "/terms",
+    "/blog",
+    "/blog/parkgolf",
+    "/blog/hotspring",
+    "/blog/swim",
+    "/blog/hiking",
   ];
 
   const lowPriority = ["/privacy", "/terms", "/contact"];
@@ -66,5 +73,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     /* DB 조회 실패 시 정적 경로만으로 사이트맵 생성 */
   }
 
-  return [...staticEntries, ...regionEntries, ...placeEntries];
+  // 블로그 글
+  let blogEntries: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await fetchAllPublished();
+    blogEntries = posts.map((p) => ({
+      url: `${siteConfig.url}${blogPostPath(p.category, p.slug)}`,
+      lastModified: p.updatedAt ?? p.publishedAt ?? undefined,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }));
+  } catch {
+    /* 무시 */
+  }
+
+  return [...staticEntries, ...regionEntries, ...blogEntries, ...placeEntries];
 }

@@ -46,6 +46,11 @@ export const mainNav: NavItem[] = [
     description: "동네 뒷산부터 명산까지 가볍게.",
   },
   {
+    title: "블로그",
+    href: "/blog",
+    description: "파크골프·온천·수영·등산 나들이 이야기.",
+  },
+  {
     title: "이용 가이드",
     href: "/guide",
     description: "지도로 나들이 스팟 찾는 법 총정리.",

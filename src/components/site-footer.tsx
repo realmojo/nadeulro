@@ -13,11 +13,13 @@ export function SiteFooter() {
     { title: "온천", href: "/hotspring" },
     { title: "수영장", href: "/swim" },
     { title: "등산", href: "/hiking" },
+    { title: "블로그", href: "/blog" },
     { title: "이용 가이드", href: "/guide" },
   ];
 
   const subLinks = [
     { title: "나들로 소개", href: "/about" },
+    { title: "블로그", href: "/blog" },
     { title: "이용 가이드", href: "/guide" },
     { title: "문의하기", href: "/contact" },
     { title: "개인정보처리방침", href: "/privacy" },
