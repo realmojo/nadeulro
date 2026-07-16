@@ -5,6 +5,7 @@ import { MapScreen } from "@/components/map/map-screen";
 import {
   CATEGORIES,
   placeDetailPath,
+  regionPath,
   type Place,
   type PlaceCategory,
 } from "@/lib/places";
@@ -117,11 +118,13 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
         <p>{seo.intro}</p>
         {regions.length > 0 && (
           <>
-            <h2>지역별 {meta.label} 수</h2>
+            <h2>지역별 {meta.label}</h2>
             <ul>
               {regions.map(([r, n]) => (
                 <li key={r}>
-                  {r} {meta.label} {n.toLocaleString()}곳
+                  <Link href={regionPath(category, r)}>
+                    {r} {meta.label} {n.toLocaleString()}곳
+                  </Link>
                 </li>
               ))}
             </ul>

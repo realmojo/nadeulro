@@ -212,6 +212,11 @@ export function placeHeading(
   return `${where} 코스 예약 정보`;
 }
 
+/** 지역별 랜딩 페이지 경로 (예: /parkgolf/region/서울) */
+export function regionPath(category: PlaceCategory, region: string): string {
+  return `${CATEGORIES[category].path}/region/${encodeURIComponent(region)}`;
+}
+
 /** 카카오맵 길찾기 링크 */
 export function kakaoDirectionsUrl(p: Place): string {
   return `https://map.kakao.com/link/to/${encodeURIComponent(p.name)},${p.lat},${p.lng}`;

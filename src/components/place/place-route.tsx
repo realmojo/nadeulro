@@ -1,18 +1,36 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Award } from "lucide-react";
 
 import {
   CATEGORIES,
-  isTop100,
   placeDetailPath,
   placeHeading,
+  type Place,
   type PlaceCategory,
 } from "@/lib/places";
-import { PlaceDetailContent } from "@/components/place/place-detail-content";
-import { fetchPlaceByName } from "@/lib/places-server";
+import { buildFaqs, faqJsonLd } from "@/lib/place-seo";
+import { PlaceArticle } from "@/components/place/place-article";
+import { fetchPlaceByName, fetchRelated } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
+
+/** schema.org @type — 카테고리별 세분화 */
+const SCHEMA_TYPE: Record<PlaceCategory, string> = {
+  parkgolf: "SportsActivityLocation",
+  swim: "SportsActivityLocation",
+  hotspring: "DaySpa",
+  hiking: "TouristAttraction",
+};
+
+/** PostalAddress 구조화 */
+function postalAddress(p: Place) {
+  return {
+    "@type": "PostalAddress",
+    ...(p.address ? { streetAddress: p.address } : {}),
+    ...(p.region ? { addressRegion: p.region } : {}),
+    ...(p.city ? { addressLocality: p.city } : {}),
+    addressCountry: "KR",
+  };
+}
 
 type RouteProps = { params: Promise<{ title: string }> };
 
@@ -72,15 +90,22 @@ export async function PlaceDetailRoute({
   const place = await fetchPlaceByName(category, name);
   if (!place) notFound();
 
+  let related = { sameRegion: [] as Place[], nearby: [] as Place[] };
+  try {
+    related = await fetchRelated(place);
+  } catch {
+    /* 관련 조회 실패해도 본문은 렌더 */
+  }
+
   const url = `${siteConfig.url}${placeDetailPath(category, place.name)}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": category === "hiking" ? "TouristAttraction" : "LocalBusiness",
+    "@type": SCHEMA_TYPE[category],
     name: place.name,
     description: place.description ?? place.attributes.subtitle ?? undefined,
     url,
-    ...(place.address ? { address: place.address } : {}),
+    ...(place.address ? { address: postalAddress(place) } : {}),
     ...(place.phone ? { telephone: place.phone } : {}),
     ...(place.lat != null && place.lng != null
       ? { geo: { "@type": "GeoCoordinates", latitude: place.lat, longitude: place.lng } }
@@ -89,6 +114,8 @@ export async function PlaceDetailRoute({
       ? { image: place.attributes.image.replace(/^http:\/\//, "https://") }
       : {}),
   };
+
+  const faqs = buildFaqs(place);
 
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -106,7 +133,7 @@ export async function PlaceDetailRoute({
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-4 md:py-8">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -115,37 +142,18 @@ export async function PlaceDetailRoute({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
-
-      {/* 상단: 목록으로 + 카테고리 배지 */}
-      <div className="flex items-center gap-2">
-        <Link
-          href={meta.path}
-          className="flex size-11 shrink-0 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted"
-          aria-label={`${meta.label} 목록으로`}
-        >
-          <ArrowLeft className="size-6" />
-        </Link>
-        <span
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold text-white"
-          style={{ backgroundColor: meta.color }}
-        >
-          {meta.label}
-        </span>
-        {isTop100(place) ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-persimmon/40 bg-persimmon/10 px-3 py-1 text-sm font-semibold text-persimmon">
-            <Award className="size-4" />
-            100대 명산
-          </span>
-        ) : null}
-      </div>
-
-      <div className="mt-3">
-        <PlaceDetailContent
-          place={place}
-          titleAs="h1"
-          heading={placeHeading(place)}
+      {faqs.length ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd(faqs)) }}
         />
-      </div>
-    </div>
+      ) : null}
+
+      <PlaceArticle
+        place={place}
+        heading={placeHeading(place)}
+        related={related}
+      />
+    </>
   );
 }

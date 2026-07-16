@@ -92,6 +92,117 @@ export async function fetchPlaceByName(
   return row ? rowToPlace(row) : null;
 }
 
+export type RelatedPlaces = {
+  /** 같은 지역·같은 카테고리 */
+  sameRegion: Place[];
+  /** 좌표 기준 가까운 다른 카테고리(+같은 카테고리) */
+  nearby: Place[];
+};
+
+function haversine(aLat: number, aLng: number, bLat: number, bLng: number) {
+  const R = 6371;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((aLat * Math.PI) / 180) *
+      Math.cos((bLat * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+/** 상세 페이지 내부링크용: 같은 지역 + 가까운 곳(좌표) */
+export async function fetchRelated(place: Place): Promise<RelatedPlaces> {
+  const supabase = makeClient();
+
+  // 같은 지역·같은 카테고리 (자기 자신 제외, 최대 8)
+  let sameRegion: Place[] = [];
+  if (place.region) {
+    const { data } = await supabase
+      .from("nadeulro_places")
+      .select(SELECT_COLS_LIST)
+      .eq("category", place.category)
+      .eq("region", place.region)
+      .neq("id", place.id)
+      .order("id", { ascending: true })
+      .limit(9);
+    sameRegion = ((data ?? []) as Row[]).map(rowToPlace).slice(0, 8);
+  }
+
+  // 좌표 바운딩박스 → 하버사인 정렬 (다른 카테고리 우선 노출)
+  let nearby: Place[] = [];
+  if (place.lat != null && place.lng != null) {
+    const dLat = 0.25;
+    const dLng = 0.3;
+    const { data } = await supabase
+      .from("nadeulro_places")
+      .select(SELECT_COLS_LIST)
+      .neq("id", place.id)
+      .gte("lat", place.lat - dLat)
+      .lte("lat", place.lat + dLat)
+      .gte("lng", place.lng - dLng)
+      .lte("lng", place.lng + dLng)
+      .limit(400);
+    const rows = ((data ?? []) as Row[])
+      .map(rowToPlace)
+      .filter((p) => p.lat != null && p.lng != null)
+      .map((p) => ({
+        p,
+        d: haversine(place.lat!, place.lng!, p.lat!, p.lng!),
+      }))
+      .sort((a, b) => a.d - b.d);
+    // 다른 카테고리 먼저 6곳, 부족하면 같은 카테고리로 채움
+    const other = rows.filter((x) => x.p.category !== place.category);
+    const sameIds = new Set(sameRegion.map((s) => s.id));
+    nearby = [...other, ...rows.filter((x) => x.p.category === place.category)]
+      .map((x) => x.p)
+      .filter((p) => !sameIds.has(p.id))
+      .slice(0, 6);
+  }
+
+  return { sameRegion, nearby };
+}
+
+/** 지역별 랜딩용: 카테고리+지역의 전체 장소 (도시→이름 정렬) */
+export async function fetchByCategoryRegion(
+  category: PlaceCategory,
+  region: string,
+): Promise<Place[]> {
+  const supabase = makeClient();
+  const { data, error } = await supabase
+    .from("nadeulro_places")
+    .select(SELECT_COLS_LIST)
+    .eq("category", category)
+    .eq("region", region)
+    .order("city", { ascending: true })
+    .order("name", { ascending: true })
+    .limit(1500);
+  if (error) throw new Error(`지역 조회 실패: ${error.message}`);
+  return ((data ?? []) as Row[]).map(rowToPlace);
+}
+
+/** 카테고리별 지역(시도) + 개수 — 지역 페이지 생성/색인용 */
+export async function regionsForCategory(
+  category: PlaceCategory,
+): Promise<Array<{ region: string; count: number }>> {
+  const supabase = makeClient();
+  const m = new Map<string, number>();
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("nadeulro_places")
+      .select("region")
+      .eq("category", category)
+      .order("id", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`지역 집계 실패: ${error.message}`);
+    for (const r of (data ?? []) as Array<{ region: string | null }>) {
+      if (r.region) m.set(r.region, (m.get(r.region) ?? 0) + 1);
+    }
+    if (!data || data.length < PAGE) break;
+  }
+  return [...m.entries()].map(([region, count]) => ({ region, count }));
+}
+
 type Row = {
   id: number;
   category: PlaceCategory;
