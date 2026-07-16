@@ -13,12 +13,12 @@ export function SiteFooter() {
     { title: "온천", href: "/hotspring" },
     { title: "수영장", href: "/swim" },
     { title: "등산", href: "/hiking" },
-    { title: "입문 가이드", href: "/guide" },
+    { title: "이용 가이드", href: "/guide" },
   ];
 
   const subLinks = [
     { title: "나들로 소개", href: "/about" },
-    { title: "입문 가이드", href: "/guide" },
+    { title: "이용 가이드", href: "/guide" },
     { title: "문의하기", href: "/contact" },
     { title: "개인정보처리방침", href: "/privacy" },
     { title: "이용약관", href: "/terms" },
@@ -32,7 +32,7 @@ export function SiteFooter() {
           전국 파크골프장·온천·수영장·등산 명소 3,000여 곳의 실제 위치와 시설 정보를
           카카오맵 기반의 나들이 지도 한 장으로 보여주는 1인 운영 정보
           사이트입니다. 시설 정보는 각 지방자치단체·공공기관의 공개 자료를
-          기반으로 하며, 지도 데이터와 함께 파크골프 입문 가이드 같은 직접
+          기반으로 하며, 지도 데이터와 함께 이용 가이드 같은 직접
           작성한 콘텐츠를 제공합니다.
         </FooterRow>
 

@@ -139,6 +139,27 @@ export const CATEGORY_ORDER: PlaceCategory[] = [
   "hiking",
 ];
 
+/** 시도(광역) 목록 — 지역 필터 노출 순서(행정구역 통상 순) */
+export const REGION_ORDER: string[] = [
+  "서울",
+  "경기",
+  "인천",
+  "강원",
+  "충북",
+  "충남",
+  "대전",
+  "세종",
+  "전북",
+  "전남",
+  "광주",
+  "경북",
+  "경남",
+  "대구",
+  "울산",
+  "부산",
+  "제주",
+];
+
 export function isPlaceCategory(v: string | null | undefined): v is PlaceCategory {
   return v === "parkgolf" || v === "hotspring" || v === "swim" || v === "hiking";
 }

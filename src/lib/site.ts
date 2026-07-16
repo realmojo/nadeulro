@@ -46,8 +46,8 @@ export const mainNav: NavItem[] = [
     description: "동네 뒷산부터 명산까지 가볍게.",
   },
   {
-    title: "입문 가이드",
+    title: "이용 가이드",
     href: "/guide",
-    description: "파크골프란 · 비용 · 장비 · 규칙 총정리.",
+    description: "지도로 나들이 스팟 찾는 법 총정리.",
   },
 ];

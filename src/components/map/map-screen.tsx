@@ -28,6 +28,7 @@ import type {
 import {
   CATEGORIES,
   CATEGORY_ORDER,
+  REGION_ORDER,
   markerSize,
   markerSvg,
   type Place,
@@ -100,6 +101,7 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
 
   /* ---------- UI ---------- */
   const [filter, setFilter] = useState<Filter>(initialCategory);
+  const [region, setRegion] = useState<string | null>(null); // null = 전체 지역
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [visible, setVisible] = useState<Place[]>([]);
@@ -149,12 +151,26 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
     return places.filter(
       (p) =>
         (filter === "all" || p.category === filter) &&
+        (!region || p.region === region) &&
         (!q ||
           `${p.name} ${p.address ?? ""} ${p.region ?? ""} ${p.city ?? ""}`
             .toLowerCase()
             .includes(q))
     );
-  }, [places, filter, query]);
+  }, [places, filter, region, query]);
+
+  /* 현재 카테고리 기준 지역별 개수 */
+  const regionCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    if (places) {
+      for (const p of places) {
+        if (filter !== "all" && p.category !== filter) continue;
+        if (!p.region) continue;
+        m.set(p.region, (m.get(p.region) ?? 0) + 1);
+      }
+    }
+    return m;
+  }, [places, filter]);
 
   useEffect(() => {
     filteredRef.current = filtered;
@@ -328,6 +344,25 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
     }
     apply();
   }, [filter, filtered, mapReady, mapError, places, ensureMarkers, recomputeVisible]);
+
+  /* ---------- 지역 선택 시 해당 지역으로 지도 이동 ---------- */
+  useEffect(() => {
+    if (!region || !mapReady || !places) return;
+    const maps = mapsRef.current;
+    const map = mapRef.current;
+    if (!maps || !map) return;
+    const pts = places.filter(
+      (p) =>
+        p.region === region &&
+        (filter === "all" || p.category === filter) &&
+        p.lat != null &&
+        p.lng != null
+    );
+    if (pts.length === 0) return;
+    const bounds = new maps.LatLngBounds();
+    for (const p of pts) bounds.extend(new maps.LatLng(p.lat!, p.lng!));
+    map.setBounds(bounds);
+  }, [region, filter, mapReady, places]);
 
   /* ---------- 선택 표시 ---------- */
   useEffect(() => {
@@ -538,10 +573,15 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
             <div className="space-y-3 border-b px-4 pb-3 pt-4">
               <SearchBox query={query} onChange={setQuery} />
               <ChipRow chips={chips} filter={filter} onSelect={setFilter} />
+              <RegionChips
+                region={region}
+                counts={regionCounts}
+                onSelect={setRegion}
+              />
             </div>
             <div className="flex items-baseline justify-between px-5 pb-1 pt-3">
               <p className="text-base font-semibold">
-                {query.trim() ? "검색 결과" : "이 지역"}{" "}
+                {query.trim() ? "검색 결과" : region ? `${region} 지역` : "이 지역"}{" "}
                 <span className="text-primary">{visible.length.toLocaleString()}곳</span>
               </p>
               {!query.trim() && (
@@ -576,6 +616,14 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
           </div>
           <div className="pointer-events-auto">
             <ChipRow chips={chips} filter={filter} onSelect={setFilter} elevated />
+          </div>
+          <div className="pointer-events-auto">
+            <RegionChips
+              region={region}
+              counts={regionCounts}
+              onSelect={setRegion}
+              elevated
+            />
           </div>
         </div>
 
@@ -701,7 +749,7 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
                 onClick={() => setSheet(sheet === "peek" ? "half" : "peek")}
               >
                 <span className="text-lg font-bold">
-                  {query.trim() ? "검색 결과" : "이 지역"}{" "}
+                  {query.trim() ? "검색 결과" : region ? `${region} 지역` : "이 지역"}{" "}
                   <span className="text-primary">{visible.length.toLocaleString()}곳</span>
                 </span>
                 <ChevronUp
@@ -801,6 +849,69 @@ function ChipRow({
               className={`text-sm font-bold ${active ? "text-white/85" : "text-muted-foreground"}`}
             >
               {ready ? c.count.toLocaleString() : "준비 중"}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** 지역(시도) 필터 칩 — 전체 + 17개 시도 (개수 0인 지역은 흐리게·비활성) */
+function RegionChips({
+  region,
+  counts,
+  onSelect,
+  elevated = false,
+}: {
+  region: string | null;
+  counts: Map<string, number>;
+  onSelect: (r: string | null) => void;
+  elevated?: boolean;
+}) {
+  const chipCls = (active: boolean, disabled: boolean) =>
+    `flex h-10 shrink-0 items-center gap-1 rounded-full border px-3.5 text-[15px] font-semibold transition-colors ${
+      active
+        ? "border-transparent bg-primary text-primary-foreground"
+        : disabled
+          ? "cursor-default border-border/60 bg-card text-muted-foreground/40"
+          : `border-border bg-card text-foreground/80 hover:bg-muted ${elevated ? "shadow-md" : ""}`
+    }`;
+
+  return (
+    <div
+      className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      role="tablist"
+      aria-label="지역 필터"
+    >
+      <button
+        type="button"
+        role="tab"
+        aria-selected={region === null}
+        onClick={() => onSelect(null)}
+        className={chipCls(region === null, false)}
+      >
+        전체 지역
+      </button>
+      {REGION_ORDER.map((r) => {
+        const n = counts.get(r) ?? 0;
+        const active = region === r;
+        const disabled = n === 0;
+        return (
+          <button
+            key={r}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            disabled={disabled}
+            onClick={() => !disabled && onSelect(active ? null : r)}
+            className={chipCls(active, disabled)}
+          >
+            {r}
+            <span
+              className={`text-xs font-bold ${active ? "text-primary-foreground/80" : "text-muted-foreground/70"}`}
+            >
+              {n.toLocaleString()}
             </span>
           </button>
         );
