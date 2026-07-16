@@ -92,6 +92,19 @@ export async function fetchPlaceByName(
   return row ? rowToPlace(row) : null;
 }
 
+/** id 로 단건 조회 (본문 description 포함) — 지도 시트 지연 로딩용 */
+export async function fetchPlaceById(id: number): Promise<Place | null> {
+  const supabase = makeClient();
+  const { data, error } = await supabase
+    .from("nadeulro_places")
+    .select(SELECT_COLS)
+    .eq("id", id)
+    .limit(1);
+  if (error) throw new Error(`nadeulro_places id 조회 실패: ${error.message}`);
+  const row = (data ?? [])[0] as Row | undefined;
+  return row ? rowToPlace(row) : null;
+}
+
 export type RelatedPlaces = {
   /** 같은 지역·같은 카테고리 */
   sameRegion: Place[];

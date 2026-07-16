@@ -538,10 +538,36 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
   }, [sheetHeight]);
 
   /* ---------- 파생 ---------- */
-  const selected = useMemo(
+  const listSelected = useMemo(
     () => (selectedId != null ? places?.find((p) => p.id === selectedId) ?? null : null),
     [selectedId, places]
   );
+  /* 선택 시 본문(description) 포함 전체 데이터를 지연 로딩 (목록엔 description 없음).
+     캐시는 state Map — setState 는 async 콜백에서만 호출한다. */
+  const [fullCache, setFullCache] = useState<Map<number, Place>>(() => new Map());
+  useEffect(() => {
+    if (selectedId == null || fullCache.has(selectedId)) return;
+    let alive = true;
+    fetch(`/api/place?id=${selectedId}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((p: Place) => {
+        if (!alive) return;
+        setFullCache((prev) =>
+          prev.has(p.id) ? prev : new Map(prev).set(p.id, p),
+        );
+      })
+      .catch(() => {
+        /* 실패 시 목록 데이터(설명 없음)로 표시 */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [selectedId, fullCache]);
+  /* 본문 로딩 전엔 목록 데이터, 로딩되면 전체 데이터 */
+  const selected =
+    selectedId != null
+      ? fullCache.get(selectedId) ?? listSelected
+      : null;
   const total = counts.parkgolf + counts.hotspring + counts.swim + counts.hiking;
   /* 데이터 준비(=SDK 로드 + fetch + 첫 마커 렌더) 완료 전까지 로딩으로 본다 */
   const preparing = !mapError && !dataError && (!mapReady || !places || !firstPaint);
