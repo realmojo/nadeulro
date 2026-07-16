@@ -22,6 +22,7 @@ import {
   buildFaqs,
   checklist,
   closing,
+  disclaimer,
   facilityRows,
   tipSection,
   usageIntro,
@@ -301,9 +302,7 @@ export function PlaceArticle({
       ) : null}
 
       <p className="mt-8 break-keep rounded-lg bg-secondary/60 p-3 text-sm leading-relaxed text-muted-foreground">
-        본 정보는 각 지방자치단체·공공기관의 공개 자료를 바탕으로 정리한 나들이
-        참고용 자료입니다. 실제 운영시간·요금·휴무와 다를 수 있으니 방문 전 해당
-        시설에 확인해 주세요.
+        {disclaimer(place)}
       </p>
     </article>
   );
