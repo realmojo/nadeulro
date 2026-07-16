@@ -24,6 +24,7 @@ import {
   isTop100,
   kakaoDirectionsUrl,
   placeDetailPath,
+  reserveLink,
   type Place,
 } from "@/lib/places";
 
@@ -46,6 +47,7 @@ export function PlaceDetailContent({
   heading?: string;
 }) {
   const attr = place.attributes;
+  const reserve = reserveLink(place);
   const [copied, setCopied] = useState(false);
   const [descOpen, setDescOpen] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
@@ -243,7 +245,7 @@ export function PlaceDetailContent({
           </Link>
         </div>
 
-        {place.phone || place.reserveUrl ? (
+        {place.phone || reserve ? (
           <div className="grid grid-cols-2 gap-3">
             {place.phone ? (
               <a
@@ -254,9 +256,9 @@ export function PlaceDetailContent({
                 전화하기
               </a>
             ) : null}
-            {place.reserveUrl ? (
+            {reserve ? (
               <a
-                href={place.reserveUrl}
+                href={reserve}
                 target="_blank"
                 rel="noreferrer"
                 className="flex min-h-13 items-center justify-center gap-2 rounded-xl border-2 border-primary/25 bg-card px-3 text-base font-semibold text-primary transition-colors hover:bg-accent"

@@ -17,6 +17,7 @@ import {
   kakaoDirectionsUrl,
   placeDetailPath,
   regionPath,
+  reserveLink,
   type Place,
 } from "@/lib/places";
 import {
@@ -55,6 +56,7 @@ export function PlaceArticle({
   const notes = usageNotes(place);
   const items = checklist(place);
   const contact = contactNote(place);
+  const reserve = reserveLink(place);
   const usageTitle =
     place.category === "parkgolf"
       ? "예약 방법 및 이용 안내"
@@ -126,7 +128,7 @@ export function PlaceArticle({
           <Navigation className="size-5" />
           카카오맵 길찾기
         </a>
-        {place.phone || place.reserveUrl ? (
+        {place.phone || reserve ? (
           <div className="grid grid-cols-2 gap-3">
             {place.phone ? (
               <a
@@ -137,9 +139,9 @@ export function PlaceArticle({
                 전화하기
               </a>
             ) : null}
-            {place.reserveUrl ? (
+            {reserve ? (
               <a
-                href={place.reserveUrl}
+                href={reserve}
                 target="_blank"
                 rel="noreferrer"
                 className="flex min-h-13 items-center justify-center gap-2 rounded-xl border-2 border-primary/25 bg-card px-3 text-base font-semibold text-primary transition-colors hover:bg-accent"

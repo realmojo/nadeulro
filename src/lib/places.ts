@@ -224,6 +224,18 @@ export function kakaoDirectionsUrl(p: Place): string {
   return `https://map.kakao.com/link/to/${encodeURIComponent(p.name)},${p.lat},${p.lng}`;
 }
 
+/**
+ * 외부 예약·홈페이지 링크 — 실제 시설 링크만 반환.
+ * 온천 데이터의 reserve_url 은 전부 onchun.com(제3자 정보 디렉터리)이라
+ * '예약·홈페이지'로 안내하면 오해를 주고 트래픽이 유출되므로 노출하지 않는다.
+ */
+export function reserveLink(p: Place): string | null {
+  const u = p.reserveUrl?.trim();
+  if (!u) return null;
+  if (/(?:^|\/\/|\.)onchun\.com\b/i.test(u)) return null;
+  return u.replace(/^http:\/\//, "https://");
+}
+
 /** 카카오맵에서 보기 */
 export function kakaoMapUrl(p: Place): string {
   return `https://map.kakao.com/link/map/${encodeURIComponent(p.name)},${p.lat},${p.lng}`;
