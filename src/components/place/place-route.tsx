@@ -10,8 +10,21 @@ import {
 } from "@/lib/places";
 import { buildFaqs, faqJsonLd } from "@/lib/place-seo";
 import { PlaceArticle } from "@/components/place/place-article";
-import { fetchPlaceByName, fetchRelated } from "@/lib/places-server";
+import {
+  fetchPlaceByName,
+  fetchPlaceBySlug,
+  fetchRelated,
+} from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
+
+/** slug 로 먼저 조회, 없으면 구 URL(이름/%20) 호환을 위해 이름으로도 조회 */
+async function resolvePlace(category: PlaceCategory, param: string) {
+  const key = decodeURIComponent(param);
+  return (
+    (await fetchPlaceBySlug(category, key)) ??
+    (await fetchPlaceByName(category, key))
+  );
+}
 
 /** schema.org @type — 카테고리별 세분화 */
 const SCHEMA_TYPE: Record<PlaceCategory, string> = {
@@ -40,17 +53,19 @@ export async function placeDetailMetadata(
   props: RouteProps,
 ): Promise<Metadata> {
   const { title } = await props.params;
-  const name = decodeURIComponent(title);
   const meta = CATEGORIES[category];
 
   let place = null;
   try {
-    place = await fetchPlaceByName(category, name);
+    place = await resolvePlace(category, title);
   } catch {
     /* 조회 실패 시 기본 메타로 진행 */
   }
   if (!place) {
-    return { title: `${name} — ${meta.label}`, robots: { index: false } };
+    return {
+      title: `${decodeURIComponent(title)} — ${meta.label}`,
+      robots: { index: false },
+    };
   }
 
   const pageTitle = placeHeading(place);
@@ -58,7 +73,7 @@ export async function placeDetailMetadata(
     place.attributes.subtitle ||
     place.description?.replace(/\s+/g, " ").slice(0, 120) ||
     `${place.name}(${meta.label})의 위치·연락처·상세 정보. 카카오맵 길찾기로 바로 출발하세요.`;
-  const url = `${siteConfig.url}${placeDetailPath(category, place.name)}`;
+  const url = `${siteConfig.url}${placeDetailPath(category, place.slug)}`;
 
   return {
     title: pageTitle,
@@ -84,10 +99,9 @@ export async function PlaceDetailRoute({
   props: RouteProps;
 }) {
   const { title } = await props.params;
-  const name = decodeURIComponent(title);
   const meta = CATEGORIES[category];
 
-  const place = await fetchPlaceByName(category, name);
+  const place = await resolvePlace(category, title);
   if (!place) notFound();
 
   let related = { sameRegion: [] as Place[], nearby: [] as Place[] };
@@ -97,7 +111,7 @@ export async function PlaceDetailRoute({
     /* 관련 조회 실패해도 본문은 렌더 */
   }
 
-  const url = `${siteConfig.url}${placeDetailPath(category, place.name)}`;
+  const url = `${siteConfig.url}${placeDetailPath(category, place.slug)}`;
 
   const jsonLd = {
     "@context": "https://schema.org",

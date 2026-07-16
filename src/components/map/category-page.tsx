@@ -136,7 +136,7 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
             <ul>
               {sample.map((p) => (
                 <li key={p.id}>
-                  <Link href={placeDetailPath(p.category, p.name)}>
+                  <Link href={placeDetailPath(p.category, p.slug)}>
                     {p.name}
                   </Link>
                   {p.address ? ` — ${p.address}` : ""}

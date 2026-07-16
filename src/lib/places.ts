@@ -42,6 +42,8 @@ export type Place = {
   id: number;
   category: PlaceCategory;
   name: string;
+  /** URL 슬러그(공백·특수문자 → 대시) */
+  slug: string;
   region: string | null;
   city: string | null;
   address: string | null;
@@ -193,12 +195,12 @@ export function isTop100(p: Place): boolean {
   return p.category === "hiking" && Boolean(p.attributes.top100_reason);
 }
 
-/** 장소 상세 페이지 경로 (name 기반, 예: /hiking/가리산) */
+/** 장소 상세 페이지 경로 (slug 기반, 예: /hiking/가리산, /parkgolf/여의도한강-파크골프장) */
 export function placeDetailPath(
   category: PlaceCategory,
-  name: string,
+  slug: string,
 ): string {
-  return `${CATEGORIES[category].path}/${encodeURIComponent(name)}`;
+  return `${CATEGORIES[category].path}/${encodeURIComponent(slug)}`;
 }
 
 /**

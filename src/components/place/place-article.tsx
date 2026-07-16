@@ -341,7 +341,7 @@ function RelatedList({
           return (
             <li key={p.id}>
               <Link
-                href={placeDetailPath(p.category, p.name)}
+                href={placeDetailPath(p.category, p.slug)}
                 className="flex items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-accent/40"
               >
                 <span

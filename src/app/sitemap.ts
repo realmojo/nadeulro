@@ -51,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const { places } = await fetchPlaces();
     placeEntries = places.map((p) => ({
-      url: `${siteConfig.url}${placeDetailPath(p.category, p.name)}`,
+      url: `${siteConfig.url}${placeDetailPath(p.category, p.slug)}`,
       changeFrequency: "monthly",
       priority: 0.6,
     }));

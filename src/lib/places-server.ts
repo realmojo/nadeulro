@@ -6,14 +6,14 @@ const PAGE = 1000;
 
 /** 상세(단건) select — 긴 본문 포함 */
 const SELECT_COLS =
-  "id,category,name,region,city,address,lat,lng,phone,reserve_url,description,attributes";
+  "id,category,name,slug,region,city,address,lat,lng,phone,reserve_url,description,attributes";
 
 /**
  * 목록(전체) select — description(산 소개 등 긴 본문) 제외.
  * 등산 1,338곳의 본문만 페이지당 수백 KB 를 차지해 지도 로딩을 늦춘다.
  */
 const SELECT_COLS_LIST =
-  "id,category,name,region,city,address,lat,lng,phone,reserve_url,attributes";
+  "id,category,name,slug,region,city,address,lat,lng,phone,reserve_url,attributes";
 
 /** 지도 화면이 실제로 쓰는 attributes 키 (나머지는 내부 메타 → 목록에서 제거) */
 const LIST_ATTR_KEYS = [
@@ -47,6 +47,7 @@ function rowToPlace(r: Row): Place {
     id: r.id,
     category: r.category,
     name: r.name,
+    slug: r.slug,
     region: r.region,
     city: r.city,
     address: r.address,
@@ -88,6 +89,23 @@ export async function fetchPlaceByName(
     .limit(1);
 
   if (error) throw new Error(`nadeulro_places 단건 조회 실패: ${error.message}`);
+  const row = (data ?? [])[0] as Row | undefined;
+  return row ? rowToPlace(row) : null;
+}
+
+/** 슬러그로 단건 조회 (상세 페이지 /[category]/[slug] 용) */
+export async function fetchPlaceBySlug(
+  category: PlaceCategory,
+  slug: string,
+): Promise<Place | null> {
+  const supabase = makeClient();
+  const { data, error } = await supabase
+    .from("nadeulro_places")
+    .select(SELECT_COLS)
+    .eq("category", category)
+    .eq("slug", slug)
+    .limit(1);
+  if (error) throw new Error(`nadeulro_places slug 조회 실패: ${error.message}`);
   const row = (data ?? [])[0] as Row | undefined;
   return row ? rowToPlace(row) : null;
 }
@@ -220,6 +238,7 @@ type Row = {
   id: number;
   category: PlaceCategory;
   name: string;
+  slug: string;
   region: string | null;
   city: string | null;
   address: string | null;

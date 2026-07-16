@@ -99,7 +99,7 @@ export async function RegionPage({
       "@type": "ListItem",
       position: i + 1,
       name: p.name,
-      url: `${siteConfig.url}${placeDetailPath(p.category, p.name)}`,
+      url: `${siteConfig.url}${placeDetailPath(p.category, p.slug)}`,
     })),
   };
   const breadcrumb = {
@@ -165,7 +165,7 @@ export async function RegionPage({
                 {list.map((p) => (
                   <li key={p.id}>
                     <Link
-                      href={placeDetailPath(p.category, p.name)}
+                      href={placeDetailPath(p.category, p.slug)}
                       className="flex items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-accent/40"
                     >
                       <span className="min-w-0 flex-1">

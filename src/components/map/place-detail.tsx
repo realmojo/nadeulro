@@ -51,7 +51,7 @@ export function PlaceDetail({
       <div className="panel-scroll flex-1 overflow-y-auto px-5 pb-5 pt-2">
         <PlaceDetailContent place={place} titleAs="h2" />
         <Link
-          href={placeDetailPath(place.category, place.name)}
+          href={placeDetailPath(place.category, place.slug)}
           className="mt-4 inline-flex items-center gap-1.5 text-base font-semibold text-primary hover:underline"
         >
           <ExternalLink className="size-4" />
