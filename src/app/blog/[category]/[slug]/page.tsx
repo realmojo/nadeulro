@@ -75,7 +75,10 @@ export default async function BlogPostPage({ params }: Props) {
   const label = blogCategoryLabel(cat);
   const color = blogCategoryColor(cat);
   const meta = CATEGORIES[cat];
-  const html = marked.parse(post.content) as string;
+  // 표는 모바일에서 가로 스크롤되도록 래핑
+  const html = (marked.parse(post.content) as string)
+    .replace(/<table>/g, '<div class="blog-table"><table>')
+    .replace(/<\/table>/g, "</table></div>");
   const url = `${siteConfig.url}${blogPostPath(cat, post.slug)}`;
 
   let related = [] as Awaited<ReturnType<typeof fetchPosts>>;
@@ -107,6 +110,18 @@ export default async function BlogPostPage({ params }: Props) {
     articleSection: label,
     keywords: post.tags.join(", "),
   };
+  const faqJsonLd =
+    post.faq.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: post.faq.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }
+      : null;
   const breadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -122,6 +137,9 @@ export default async function BlogPostPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      {faqJsonLd ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      ) : null}
 
       <article className="mx-auto w-full max-w-2xl px-4 py-6 md:py-10">
         {/* 브레드크럼 (가시) */}
@@ -165,6 +183,33 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* 본문 */}
         <div className="blog-prose mt-6" dangerouslySetInnerHTML={{ __html: html }} />
+
+        {/* 자주 묻는 질문 (FAQPage 구조화 데이터와 연동) */}
+        {post.faq.length ? (
+          <section className="mt-10" aria-labelledby="faq-heading">
+            <h2 id="faq-heading" className="font-display text-2xl font-bold">
+              자주 묻는 질문
+            </h2>
+            <dl className="mt-4 space-y-3">
+              {post.faq.map((f) => (
+                <details
+                  key={f.q}
+                  className="group rounded-xl border bg-card p-4 [&_summary::-webkit-details-marker]:hidden"
+                >
+                  <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-bold">
+                    <dt>{f.q}</dt>
+                    <span className="text-primary transition-transform group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <dd className="mt-2.5 break-keep text-base leading-relaxed text-muted-foreground">
+                    {f.a}
+                  </dd>
+                </details>
+              ))}
+            </dl>
+          </section>
+        ) : null}
 
         {post.tags.length ? (
           <div className="mt-8 flex flex-wrap gap-2">

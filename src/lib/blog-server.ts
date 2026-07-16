@@ -18,13 +18,14 @@ type Row = {
   content: string;
   cover_image: string | null;
   tags: string[] | null;
+  faq: Array<{ q: string; a: string }> | null;
   published_at: string | null;
   updated_at: string | null;
 };
 
 const LIST_COLS =
   "id,category,slug,title,excerpt,cover_image,tags,published_at,updated_at";
-const FULL_COLS = `${LIST_COLS},content`;
+const FULL_COLS = `${LIST_COLS},content,faq`;
 
 function toPost(r: Row): BlogPost {
   return {
@@ -36,6 +37,7 @@ function toPost(r: Row): BlogPost {
     content: r.content ?? "",
     coverImage: r.cover_image,
     tags: r.tags ?? [],
+    faq: Array.isArray(r.faq) ? r.faq : [],
     publishedAt: r.published_at,
     updatedAt: r.updated_at,
   };

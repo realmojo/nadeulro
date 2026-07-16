@@ -14,6 +14,7 @@ export type BlogPost = {
   content: string; // markdown
   coverImage: string | null;
   tags: string[];
+  faq: Array<{ q: string; a: string }>;
   publishedAt: string | null;
   updatedAt: string | null;
 };

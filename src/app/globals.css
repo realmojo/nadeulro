@@ -276,6 +276,38 @@
     border-radius: 0.35rem;
     font-size: 0.9em;
   }
+  /* 표 — 모바일 가로 스크롤 래퍼 + 읽기 쉬운 격자 */
+  .blog-prose .blog-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+  }
+  .blog-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .blog-prose thead th {
+    background: color-mix(in oklch, var(--primary) 12%, var(--card));
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .blog-prose th,
+  .blog-prose td {
+    padding: 0.7em 0.9em;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    word-break: keep-all;
+  }
+  .blog-prose tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .blog-prose tbody tr:nth-child(even) td {
+    background: color-mix(in oklch, var(--muted) 45%, transparent);
+  }
 
   /* 등고선(지형도) 배경 — 히어로·섹션의 시그니처 텍스처 */
   .bg-topo {
