@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Map } from "lucide-react";
+import { Newspaper } from "lucide-react";
 
 import { CATEGORIES } from "@/lib/places";
 
@@ -14,20 +14,6 @@ export function BottomNav() {
   const pathname = usePathname();
 
   const tabs = [
-    {
-      href: "/",
-      label: "홈",
-      icon: <Home className="size-6" />,
-      active: pathname === "/",
-      color: "var(--primary)",
-    },
-    {
-      href: "/map",
-      label: "지도",
-      icon: <Map className="size-6" />,
-      active: pathname === "/map",
-      color: "var(--primary)",
-    },
     {
       href: CATEGORIES.parkgolf.path,
       label: "파크골프",
@@ -48,6 +34,20 @@ export function BottomNav() {
       icon: <CategoryGlyph cat="swim" />,
       active: pathname === CATEGORIES.swim.path,
       color: CATEGORIES.swim.color,
+    },
+    {
+      href: CATEGORIES.hiking.path,
+      label: "등산",
+      icon: <CategoryGlyph cat="hiking" />,
+      active: pathname === CATEGORIES.hiking.path,
+      color: CATEGORIES.hiking.color,
+    },
+    {
+      href: "/blog",
+      label: "블로그",
+      icon: <Newspaper className="size-6" />,
+      active: pathname.startsWith("/blog"),
+      color: "var(--primary)",
     },
   ];
 
@@ -79,7 +79,11 @@ export function BottomNav() {
   );
 }
 
-function CategoryGlyph({ cat }: { cat: "parkgolf" | "hotspring" | "swim" }) {
+function CategoryGlyph({
+  cat,
+}: {
+  cat: "parkgolf" | "hotspring" | "swim" | "hiking";
+}) {
   return (
     <svg viewBox="0 0 24 24" className="size-6" aria-hidden="true">
       <path d={CATEGORIES[cat].glyph} fill="currentColor" />
