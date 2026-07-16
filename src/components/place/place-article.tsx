@@ -4,6 +4,7 @@ import {
   Award,
   CheckCircle2,
   ExternalLink,
+  Info,
   ListChecks,
   MapPin,
   Navigation,
@@ -22,6 +23,7 @@ import {
   buildFaqs,
   checklist,
   closing,
+  contactNote,
   disclaimer,
   facilityRows,
   tipSection,
@@ -52,6 +54,7 @@ export function PlaceArticle({
   const tip = tipSection(place);
   const notes = usageNotes(place);
   const items = checklist(place);
+  const contact = contactNote(place);
   const usageTitle =
     place.category === "parkgolf"
       ? "예약 방법 및 이용 안내"
@@ -236,8 +239,8 @@ export function PlaceArticle({
 
       {/* 문의 및 연락처 */}
       <Section title="문의 및 찾아가기">
-        <div className="flex flex-wrap items-center gap-3 text-base">
-          {place.phone ? (
+        {place.phone ? (
+          <div className="flex flex-wrap items-center gap-3 text-base">
             <a
               href={`tel:${place.phone.replace(/[^0-9+]/g, "")}`}
               className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
@@ -245,21 +248,51 @@ export function PlaceArticle({
               <Phone className="size-4" />
               {place.phone}
             </a>
-          ) : (
-            <span className="text-muted-foreground">
-              별도 대표번호가 확인되지 않았습니다. 지자체·시설에 문의해 주세요.
-            </span>
-          )}
-          <a
-            href={kakaoDirectionsUrl(place)}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
-          >
-            <Navigation className="size-4" />
-            카카오맵 길찾기
-          </a>
-        </div>
+            <a
+              href={kakaoDirectionsUrl(place)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+            >
+              <Navigation className="size-4" />
+              카카오맵 길찾기
+            </a>
+          </div>
+        ) : (
+          <>
+            <div className="rounded-xl border border-border/70 bg-muted/40 p-4">
+              <p className="flex items-center gap-1.5 text-base font-bold text-foreground/90">
+                <Info className="size-4 text-primary/70" />
+                연락처가 없는 이유
+              </p>
+              <p className="mt-1.5 break-keep text-base leading-relaxed text-foreground/80">
+                {contact.reason}
+              </p>
+              <p className="mt-3 text-sm font-bold text-foreground/80">
+                이렇게 확인하세요
+              </p>
+              <ul className="mt-1.5 space-y-1.5">
+                {contact.guides.map((g) => (
+                  <li key={g} className="flex gap-2">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary/60" />
+                    <span className="break-keep text-base leading-relaxed text-foreground/80">
+                      {g}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <a
+              href={kakaoDirectionsUrl(place)}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-xl border-2 border-primary/25 bg-card px-4 font-semibold text-primary transition-colors hover:bg-accent"
+            >
+              <Navigation className="size-4" />
+              카카오맵 길찾기
+            </a>
+          </>
+        )}
       </Section>
 
       {/* FAQ */}

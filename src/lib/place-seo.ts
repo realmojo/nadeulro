@@ -86,6 +86,15 @@ export function buildFaqs(p: Place): Faq[] {
         p.id,
       )}`,
     });
+  } else {
+    const gov = p.city ? `${p.city}청` : "관할 지자체";
+    faqs.push({
+      q: `${p.name} 전화번호는 무엇인가요?`,
+      a:
+        p.category === "parkgolf"
+          ? `공영 파크골프장은 무료 개방이거나 상주 관리 인력이 없어 별도 대표번호가 등록되지 않은 곳이 많습니다. ${p.name}도 공개 자료에 연락처가 없어 현재 번호를 안내하지 못합니다. 이용 문의는 ${gov} 문화체육 담당 부서나 지역 파크골프 동호회를 통해 확인하실 수 있습니다.`
+          : `${p.name}의 대표 전화번호가 공개된 공공데이터에 포함되어 있지 않아 현재 안내하지 못합니다. 이용 문의는 ${gov} 담당 부서에 문의해 주세요.`,
+    });
   }
 
   // 예약
@@ -399,6 +408,37 @@ export function closing(p: Place): string {
 }
 
 /** 하단 면책 문구 — 3종 변형 */
+/**
+ * 연락처(전화)가 없는 곳에 대한 설명 콘텐츠 — 없는 이유 + 확인 방법.
+ * 사실에 기반: 대부분 지자체 운영 공영 구장이라 대표번호 미등록.
+ */
+export function contactNote(p: Place): { reason: string; guides: string[] } {
+  const gov = p.city
+    ? `${p.city}청`
+    : p.region
+      ? `${p.region} 관할 시·군·구청`
+      : "관할 지자체";
+  let reason: string;
+  if (p.category === "parkgolf") {
+    reason = `${p.name}은(는) 지방자치단체가 조성·운영하는 공영 구장으로 보입니다. 무료로 개방되거나 상주 관리 인력이 없어 별도 대표 전화번호가 등록되지 않은 곳이 많고, 공개된 공공데이터에도 연락처가 포함되어 있지 않아 현재 번호를 확인하지 못했습니다.`;
+  } else if (p.category === "swim") {
+    reason = `${p.name}은(는) 공공 체육시설로, 대표번호가 시설관리공단이나 지자체로 통합되어 개별 번호가 공개 자료에 등록되지 않았을 수 있습니다.`;
+  } else if (p.category === "hotspring") {
+    reason = `${p.name}의 대표 전화번호가 공개된 공공데이터에 포함되어 있지 않아 현재 확인하지 못했습니다. 운영 형태(공영·민간)에 따라 대표번호가 없거나 변경되었을 수 있습니다.`;
+  } else {
+    reason = `${p.name}의 대표 전화번호가 공개된 공공데이터에 포함되어 있지 않아 현재 확인하지 못했습니다.`;
+  }
+  const guides = [
+    `${gov} 문화체육(체육진흥) 담당 부서에 문의하면 이용 방법과 개방 시간을 안내받을 수 있습니다.`,
+    `아래 카카오맵 길찾기로 현장을 방문해 안내판이나 관리사무소에서 확인하는 방법도 있습니다.`,
+  ];
+  if (p.category === "parkgolf")
+    guides.push(
+      `지역 파크골프 동호회나 대한파크골프협회 지부를 통해서도 이용 정보를 얻을 수 있습니다.`,
+    );
+  return { reason, guides };
+}
+
 export function disclaimer(p: Place): string {
   return pickOne(
     [
