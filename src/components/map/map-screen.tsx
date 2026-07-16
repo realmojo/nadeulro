@@ -1009,6 +1009,7 @@ function PlaceRow({
     place.attributes.temp !== "-"
   )
     sub.push(`수온 ${place.attributes.temp}`);
+  const thumb = place.attributes.image?.replace(/^http:\/\//, "https://");
 
   return (
     <li>
@@ -1017,11 +1018,22 @@ function PlaceRow({
         onClick={() => onSelect(place)}
         className="flex min-h-16 w-full items-center gap-3.5 px-5 py-3 text-left transition-colors hover:bg-muted/70 active:bg-muted"
       >
-        <span
-          aria-hidden="true"
-          className="mt-0.5 size-3.5 shrink-0 rounded-full"
-          style={{ backgroundColor: meta.color }}
-        />
+        {thumb ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={thumb}
+            alt=""
+            loading="lazy"
+            className="size-12 shrink-0 rounded-xl border border-border/60 object-cover"
+            style={{ boxShadow: `inset 0 0 0 2px ${meta.color}22` }}
+          />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="mt-0.5 size-3.5 shrink-0 rounded-full"
+            style={{ backgroundColor: meta.color }}
+          />
+        )}
         <span className="min-w-0 flex-1">
           <span className="block truncate text-lg font-semibold leading-snug">
             {place.name}

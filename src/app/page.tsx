@@ -1,12 +1,15 @@
 import Link from "next/link";
-import { ArrowRight, MapPinned, Navigation, PhoneCall } from "lucide-react";
+import { ArrowRight, MapPinned, Navigation, PhoneCall, Newspaper } from "lucide-react";
 
 import { fetchPlaces } from "@/lib/places-server";
+import { fetchPosts } from "@/lib/blog-server";
 import {
   CATEGORIES,
   CATEGORY_ORDER,
   type PlaceCategory,
 } from "@/lib/places";
+import { PostCard } from "@/components/blog/post-card";
+import type { BlogPost } from "@/lib/blog";
 import { siteConfig } from "@/lib/site";
 
 /** 장소 수는 천천히 변한다 — 1시간 재생성 */
@@ -25,6 +28,13 @@ export default async function Home() {
     /* 카운트 실패 시에도 페이지는 뜬다 */
   }
   const total = CATEGORY_ORDER.reduce((s, c) => s + counts[c], 0);
+
+  let posts: BlogPost[] = [];
+  try {
+    posts = await fetchPosts({ limit: 3 });
+  } catch {
+    /* 블로그 조회 실패 시 섹션만 생략 */
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -181,6 +191,45 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* ============ 나들이 이야기(블로그) ============ */}
+      {posts.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 py-14 md:py-18">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display flex items-center gap-2 text-3xl font-bold">
+                <Newspaper className="size-7 text-primary" />
+                나들이 이야기
+              </h2>
+              <p className="mt-2 break-keep text-lg text-muted-foreground">
+                파크골프·온천·수영 입문과 이용 팁을 읽기 쉽게 정리했어요.
+              </p>
+            </div>
+            <Link
+              href="/blog"
+              className="hidden shrink-0 items-center gap-1.5 rounded-xl border-2 border-primary/25 bg-card px-4 py-2.5 text-base font-semibold text-primary transition-colors hover:bg-accent sm:inline-flex"
+            >
+              전체 보기
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+
+          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+
+          <Link
+            href="/blog"
+            className="mt-6 flex min-h-13 items-center justify-center gap-2 rounded-2xl border-2 border-primary/25 bg-card text-lg font-bold text-primary transition-colors hover:bg-accent sm:hidden"
+          >
+            <Newspaper className="size-5" />
+            나들이 이야기 전체 보기
+            <ArrowRight className="size-5" />
+          </Link>
+        </section>
+      )}
 
       {/* ============ 마감 CTA ============ */}
       <section className="bg-topo bg-primary">
