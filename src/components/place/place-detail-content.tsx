@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Award,
   Building2,
@@ -8,6 +9,7 @@ import {
   ChevronDown,
   Copy,
   ExternalLink,
+  FileText,
   Flag,
   Info,
   MapPin,
@@ -18,7 +20,12 @@ import {
   Waves,
 } from "lucide-react";
 
-import { isTop100, kakaoDirectionsUrl, type Place } from "@/lib/places";
+import {
+  isTop100,
+  kakaoDirectionsUrl,
+  placeDetailPath,
+  type Place,
+} from "@/lib/places";
 
 /** 설명이 이 글자 수를 넘으면 '더보기'로 접는다 */
 const DESC_CLAMP = 220;
@@ -215,17 +222,26 @@ export function PlaceDetailContent({
         </div>
       ) : null}
 
-      {/* 행동 버튼 */}
+      {/* 행동 버튼 — 길찾기 : 상세페이지 5:5 */}
       <div className="mt-5 grid gap-3">
-        <a
-          href={kakaoDirectionsUrl(place)}
-          target="_blank"
-          rel="noreferrer"
-          className="flex min-h-13 items-center justify-center gap-2 rounded-xl bg-persimmon px-4 text-lg font-bold text-persimmon-foreground shadow-sm transition-transform active:scale-[0.98]"
-        >
-          <Navigation className="size-5" />
-          카카오맵 길찾기
-        </a>
+        <div className="grid grid-cols-2 gap-3">
+          <a
+            href={kakaoDirectionsUrl(place)}
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-13 items-center justify-center gap-2 rounded-xl bg-persimmon px-3 text-base font-bold text-persimmon-foreground shadow-sm transition-transform active:scale-[0.98]"
+          >
+            <Navigation className="size-5" />
+            카카오맵 길찾기
+          </a>
+          <Link
+            href={placeDetailPath(place.category, place.slug)}
+            className="flex min-h-13 items-center justify-center gap-2 rounded-xl bg-primary px-3 text-base font-bold text-primary-foreground shadow-sm transition-transform active:scale-[0.98]"
+          >
+            <FileText className="size-5" />
+            상세페이지 열기
+          </Link>
+        </div>
 
         {place.phone || place.reserveUrl ? (
           <div className="grid grid-cols-2 gap-3">
