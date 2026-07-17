@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import {
   CATEGORIES,
+  isIndexablePlace,
   placeDetailPath,
   placeHeading,
   type Place,
@@ -79,6 +80,8 @@ export async function placeDetailMetadata(
     title: pageTitle,
     description,
     alternates: { canonical: url },
+    // 연락처 없는 시설 페이지는 색인 제외(품질 관리) — 링크는 따라감
+    ...(isIndexablePlace(place) ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${pageTitle} | ${siteConfig.name}`,
       description,

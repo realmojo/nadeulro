@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { blogPostPath } from "@/lib/blog";
 import { fetchAllPublished } from "@/lib/blog-server";
-import { placeDetailPath, regionPath } from "@/lib/places";
+import { isIndexablePlace, placeDetailPath, regionPath } from "@/lib/places";
 import { fetchPlaces } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
 
@@ -50,7 +50,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const regionEntries: MetadataRoute.Sitemap = [];
   try {
     const { places } = await fetchPlaces();
-    placeEntries = places.map((p) => ({
+    // 연락처 없는 시설 페이지(정보 불완전)는 사이트맵에서 제외 — 색인 품질 관리
+    placeEntries = places.filter(isIndexablePlace).map((p) => ({
       url: `${siteConfig.url}${placeDetailPath(p.category, p.slug)}`,
       changeFrequency: "monthly",
       priority: 0.6,

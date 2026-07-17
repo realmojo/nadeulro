@@ -229,6 +229,17 @@ export function kakaoDirectionsUrl(p: Place): string {
  * 온천 데이터의 reserve_url 은 전부 onchun.com(제3자 정보 디렉터리)이라
  * '예약·홈페이지'로 안내하면 오해를 주고 트래픽이 유출되므로 노출하지 않는다.
  */
+/**
+ * 색인(index) 가치가 있는 상세 페이지인지 — 저품질 대량 페이지의 색인을 줄여
+ * 사이트 전체 품질을 높인다(애드센스/SEO).
+ * - 등산: 산림청 원문 소개·높이 등 고유 콘텐츠가 있어 항상 색인.
+ * - 시설(파크골프·온천·수영): 연락처가 있어 정보가 완결된 곳만 색인.
+ */
+export function isIndexablePlace(p: Place): boolean {
+  if (p.category === "hiking") return true;
+  return Boolean(p.phone && p.phone.trim());
+}
+
 export function reserveLink(p: Place): string | null {
   const u = p.reserveUrl?.trim();
   if (!u) return null;

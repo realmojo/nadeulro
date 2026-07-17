@@ -135,6 +135,36 @@ export default async function AboutPage() {
           </div>
         </section>
 
+        {/* 데이터와 콘텐츠 */}
+        <section className="mt-12">
+          <h2 className="font-display text-2xl font-bold">데이터와 콘텐츠</h2>
+          <div className="mt-4 space-y-4 break-keep text-lg leading-relaxed text-foreground/85">
+            <p>
+              <b className="font-semibold text-foreground">위치·기본 정보</b>는
+              각 지방자치단체와 공공기관이 공개한 자료를 바탕으로 정리하고,
+              좌표와 연락처는 카카오맵 등 공개 자료로 보강합니다. 원본에 없거나
+              확인되지 않은 정보(예: 일부 시설의 전화번호)는 비워 두고, 대신
+              해당 시설·지자체에 확인하는 방법을 함께 안내합니다.
+            </p>
+            <p>
+              <b className="font-semibold text-foreground">블로그와 이용
+              가이드</b>는 파크골프·온천·수영·등산을 처음 접하는 어른을 위해
+              직접 작성한 글입니다. 입문 방법, 비용·준비물, 매너, 건강 정보를
+              쉬운 말로 정리했습니다.
+            </p>
+            <p>
+              정보는 수시로 바뀔 수 있어{" "}
+              <b className="font-semibold text-foreground">참고용</b>으로
+              제공하며, 방문 전 해당 시설에 확인하시길 권합니다. 오류를
+              발견하시면{" "}
+              <Link href="/contact" className="font-semibold text-primary hover:underline">
+                문의하기
+              </Link>
+              로 알려주시면 확인 후 반영합니다.
+            </p>
+          </div>
+        </section>
+
         {/* 운영 */}
         <section className="mt-12 rounded-2xl bg-secondary/50 p-6">
           <h2 className="font-display text-2xl font-bold">운영</h2>
