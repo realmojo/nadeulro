@@ -6,6 +6,7 @@ import Script from "next/script";
  */
 const GA_ID = "G-DFE2BJRLF0";
 const NAVER_WA = "19d45054f3b14c0";
+const ADSENSE_CLIENT = "ca-pub-9130836798889522";
 
 export function Analytics() {
   return (
@@ -36,6 +37,15 @@ export function Analytics() {
           if(window.wcs) { wcs_do(); }
         `}
       </Script>
+
+      {/* Google AdSense */}
+      <Script
+        id="adsbygoogle-init"
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+        async
+      />
     </>
   );
 }

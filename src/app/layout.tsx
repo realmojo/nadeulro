@@ -65,6 +65,9 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
   },
+  other: {
+    "google-adsense-account": "ca-pub-9130836798889522",
+  },
 };
 
 export const viewport: Viewport = {
