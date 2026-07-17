@@ -10,7 +10,29 @@ import {
   type PlaceCategory,
 } from "@/lib/places";
 import { fetchPlaces } from "@/lib/places-server";
+import { fetchPosts } from "@/lib/blog-server";
+import { blogCategoryPath, blogPostPath, type BlogPost } from "@/lib/blog";
 import { siteConfig } from "@/lib/site";
+
+/** 우측 패널용 카테고리 FAQ */
+const SIDE_FAQ: Record<PlaceCategory, Array<{ q: string; a: string }>> = {
+  parkgolf: [
+    { q: "처음이라도 칠 수 있나요?", a: "네. 규칙이 단순하고 클럽 한 자루면 돼서 첫날 바로 한 게임을 돌 수 있습니다. 공영 구장은 대부분 무료이거나 소액입니다." },
+    { q: "연락처는 어디서 보나요?", a: "각 파크골프장 상세페이지의 연락처를 확인하세요. 공영 구장은 관할 지자체 문화체육 부서로 문의할 수 있습니다." },
+  ],
+  hotspring: [
+    { q: "예약이 필요한가요?", a: "대부분 예약 없이 이용합니다. 상세페이지의 전화로 운영시간을 미리 확인하면 좋습니다." },
+    { q: "수질·수온은 어떻게 보나요?", a: "각 온천 상세페이지에서 수온과 성분(탄산·유황 등)을 확인할 수 있습니다." },
+  ],
+  swim: [
+    { q: "실내·야외 중 뭘 고르나요?", a: "사계절 운동은 실내수영장, 여름 물놀이는 야외수영장이 좋습니다. 상세페이지에서 위치·연락처를 확인하세요." },
+    { q: "강습도 있나요?", a: "시설마다 다릅니다. 초급반·아쿠아로빅 운영 여부는 전화로 문의하는 것이 정확합니다." },
+  ],
+  hiking: [
+    { q: "초보도 오를 산이 있나요?", a: "낮고 완만한 산부터 시작하세요. 각 산 상세페이지에서 높이와 소개를 확인할 수 있습니다." },
+    { q: "100대 명산은 어떻게 찾나요?", a: "등산 목록에서 100대 명산은 별도로 표시됩니다. 가까운 명산부터 도전해 보세요." },
+  ],
+};
 
 /** 카테고리별 SEO 문구 */
 const SEO: Record<
@@ -92,6 +114,117 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
     /* SEO 보조 콘텐츠 없이도 지도는 뜬다 */
   }
 
+  let posts: BlogPost[] = [];
+  try {
+    posts = await fetchPosts({ category, limit: 3 });
+  } catch {
+    /* 블로그 조회 실패 시 해당 섹션만 생략 */
+  }
+
+  const sidePanel = (
+    <div className="px-5 py-6">
+      <h2 className="font-display text-lg font-bold">{meta.label} 안내</h2>
+      <p className="mt-2 break-keep text-sm leading-relaxed text-muted-foreground">
+        {seo.intro}
+      </p>
+      {count > 0 ? (
+        <p className="mt-2 text-sm">
+          전국{" "}
+          <b className="font-bold" style={{ color: meta.color }}>
+            {count.toLocaleString()}곳
+          </b>
+        </p>
+      ) : null}
+
+      {regions.length > 0 ? (
+        <section className="mt-6">
+          <h3 className="text-sm font-bold text-foreground/80">지역별 바로가기</h3>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {regions.slice(0, 14).map(([r, n]) => (
+              <Link
+                key={r}
+                href={regionPath(category, r)}
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground/80 hover:bg-muted"
+              >
+                {r}
+                <span className="text-muted-foreground">{n}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {posts.length > 0 ? (
+        <section className="mt-6">
+          <div className="flex items-baseline justify-between">
+            <h3 className="text-sm font-bold text-foreground/80">나들이 이야기</h3>
+            <Link
+              href={blogCategoryPath(category)}
+              className="text-xs font-semibold text-primary hover:underline"
+            >
+              전체 보기
+            </Link>
+          </div>
+          <ul className="mt-2 space-y-2">
+            {posts.map((p) => (
+              <li key={p.id}>
+                <Link
+                  href={blogPostPath(p.category, p.slug)}
+                  className="block rounded-xl border bg-card p-3 transition-colors hover:bg-accent/40"
+                >
+                  <span className="block break-keep text-sm font-semibold leading-snug">
+                    {p.title}
+                  </span>
+                  {p.excerpt ? (
+                    <span className="mt-1 line-clamp-2 break-keep text-xs leading-relaxed text-muted-foreground">
+                      {p.excerpt}
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="mt-6">
+        <h3 className="text-sm font-bold text-foreground/80">자주 묻는 질문</h3>
+        <dl className="mt-2 space-y-2">
+          {SIDE_FAQ[category].map((f) => (
+            <details
+              key={f.q}
+              className="group rounded-xl border bg-card p-3 [&_summary::-webkit-details-marker]:hidden"
+            >
+              <summary className="flex cursor-pointer items-center justify-between gap-2 text-sm font-semibold">
+                {f.q}
+                <span className="text-primary transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-1.5 break-keep text-xs leading-relaxed text-muted-foreground">
+                {f.a}
+              </p>
+            </details>
+          ))}
+        </dl>
+      </section>
+
+      <section className="mt-6 border-t pt-4 text-xs text-muted-foreground">
+        <Link href="/blog" className="font-medium text-primary hover:underline">
+          블로그
+        </Link>{" "}
+        ·{" "}
+        <Link href="/guide" className="font-medium text-primary hover:underline">
+          이용 가이드
+        </Link>{" "}
+        ·{" "}
+        <Link href="/about" className="font-medium text-primary hover:underline">
+          소개
+        </Link>
+      </section>
+    </div>
+  );
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -107,7 +240,7 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <MapScreen initialCategory={category} />
+      <MapScreen initialCategory={category} sideContent={sidePanel} />
 
       {/* 검색엔진·스크린리더용 보조 콘텐츠 (지도 뒤에 위치) */}
       <section className="sr-only">

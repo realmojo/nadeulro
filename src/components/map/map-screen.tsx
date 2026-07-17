@@ -73,7 +73,13 @@ function loadPlacesOnce(): Promise<PlacesData> {
   return placesCache;
 }
 
-export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
+export function MapScreen({
+  initialCategory,
+  sideContent,
+}: {
+  initialCategory: Filter;
+  sideContent?: React.ReactNode;
+}) {
   /* ---------- 데이터 ---------- */
   const [places, setPlaces] = useState<Place[] | null>(null);
   const [counts, setCounts] = useState<Record<PlaceCategory, number>>({
@@ -796,6 +802,13 @@ export function MapScreen({ initialCategory }: { initialCategory: Filter }) {
           )}
         </div>
       </div>
+
+      {/* ---------- PC 우측 콘텐츠 패널 (xl+) ---------- */}
+      {sideContent ? (
+        <aside className="hidden w-[340px] shrink-0 flex-col overflow-y-auto border-l bg-card xl:flex">
+          {sideContent}
+        </aside>
+      ) : null}
     </div>
   );
 }
