@@ -96,8 +96,35 @@ export default function PrivacyPage() {
                 <b className="font-semibold text-foreground">네이버
                 애널리틱스</b> (네이버): 이용 통계 분석
               </>,
+              <>
+                <b className="font-semibold text-foreground">Google
+                애드센스</b> (Google): 광고 게재
+              </>,
             ]}
           />
+          <p className="mt-3">
+            Google 애드센스는 광고 게재를 위해 쿠키를 사용하며, Google을 포함한
+            제3자 광고 사업자는 이용자의 이전 방문 기록을 바탕으로 맞춤형 광고를
+            제공할 수 있습니다. 이용자는{" "}
+            <a
+              href="https://www.google.com/settings/ads"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-primary underline underline-offset-2"
+            >
+              Google 광고 설정
+            </a>
+            에서 맞춤형 광고를 끄거나,{" "}
+            <a
+              href="https://www.aboutads.info/choices"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-primary underline underline-offset-2"
+            >
+              aboutads.info
+            </a>
+            에서 제3자 광고 쿠키 사용을 거부할 수 있습니다.
+          </p>
         </Clause>
 
         <Clause title="6. 보유 및 파기">
