@@ -231,17 +231,17 @@ export function PlaceDetailContent({
             href={kakaoDirectionsUrl(place)}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-13 items-center justify-center gap-2 rounded-xl bg-persimmon px-3 text-base font-bold text-persimmon-foreground shadow-sm transition-transform active:scale-[0.98]"
+            className="flex min-h-13 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-persimmon px-2 text-[15px] font-bold text-persimmon-foreground shadow-sm transition-transform active:scale-[0.98]"
           >
-            <Navigation className="size-5" />
-            카카오맵 길찾기
+            <Navigation className="size-5 shrink-0" />
+            길찾기
           </a>
           <Link
             href={placeDetailPath(place.category, place.slug)}
-            className="flex min-h-13 items-center justify-center gap-2 rounded-xl bg-primary px-3 text-base font-bold text-primary-foreground shadow-sm transition-transform active:scale-[0.98]"
+            className="flex min-h-13 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-primary px-2 text-[15px] font-bold text-primary-foreground shadow-sm transition-transform active:scale-[0.98]"
           >
-            <FileText className="size-5" />
-            상세페이지 열기
+            <FileText className="size-5 shrink-0" />
+            상세보기
           </Link>
         </div>
 
