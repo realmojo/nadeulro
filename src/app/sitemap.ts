@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 import { blogPostPath } from "@/lib/blog";
 import { fetchAllPublished } from "@/lib/blog-server";
+import { coursePath } from "@/lib/course";
+import { fetchCourses } from "@/lib/course-server";
 import { isIndexablePlace, placeDetailPath, regionPath } from "@/lib/places";
 import { fetchPlaces } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
@@ -88,5 +90,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     /* 무시 */
   }
 
-  return [...staticEntries, ...regionEntries, ...blogEntries, ...placeEntries];
+  // 코스 페이지 (나들로 차별화 콘텐츠)
+  let courseEntries: MetadataRoute.Sitemap = [];
+  try {
+    const courses = await fetchCourses();
+    courseEntries = courses.map((c) => ({
+      url: `${siteConfig.url}${coursePath(c.slug)}`,
+      lastModified: c.updatedAt ?? undefined,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    }));
+  } catch {
+    /* 무시 */
+  }
+
+  return [
+    ...staticEntries,
+    ...courseEntries,
+    ...regionEntries,
+    ...blogEntries,
+    ...placeEntries,
+  ];
 }

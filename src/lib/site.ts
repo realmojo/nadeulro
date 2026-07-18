@@ -26,6 +26,11 @@ export const mainNav: NavItem[] = [
     description: "전국 3,000여 곳을 지도 한 장에서.",
   },
   {
+    title: "나들이 코스",
+    href: "/course",
+    description: "파크골프 + 가까운 온천을 하루 코스로.",
+  },
+  {
     title: "파크골프장",
     href: "/parkgolf",
     description: "전국 파크골프장 위치·홀수·연락처.",
