@@ -1,8 +1,18 @@
 import Link from "next/link";
-import { ArrowRight, MapPinned, Navigation, PhoneCall, Newspaper } from "lucide-react";
+import {
+  ArrowRight,
+  Car,
+  MapPinned,
+  Navigation,
+  Newspaper,
+  PhoneCall,
+  Route,
+} from "lucide-react";
 
 import { fetchPlaces } from "@/lib/places-server";
 import { fetchPosts } from "@/lib/blog-server";
+import { fetchCourses } from "@/lib/course-server";
+import { carMinutes, coursePath, type Course } from "@/lib/course";
 import {
   CATEGORIES,
   CATEGORY_ORDER,
@@ -34,6 +44,17 @@ export default async function Home() {
     posts = await fetchPosts({ limit: 3 });
   } catch {
     /* 블로그 조회 실패 시 섹션만 생략 */
+  }
+
+  let courses: Course[] = [];
+  try {
+    // 이동이 짧은(동선이 촘촘한) 코스 6개를 대표로
+    const all = await fetchCourses();
+    courses = [...all]
+      .sort((a, b) => (a.totalKm ?? 99) - (b.totalKm ?? 99))
+      .slice(0, 6);
+  } catch {
+    /* 코스 조회 실패 시 섹션만 생략 */
   }
 
   const jsonLd = {
@@ -139,6 +160,93 @@ export default async function Home() {
           })}
         </div>
       </section>
+
+      {/* ============ 나들이 코스 (차별점) ============ */}
+      {courses.length > 0 && (
+        <section className="border-y bg-accent/20">
+          <div className="mx-auto max-w-6xl px-4 py-14 md:py-18">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">
+                  <Route className="size-4" />
+                  나들로만의 코스
+                </p>
+                <h2 className="font-display mt-3 text-3xl font-bold">
+                  하루가 하나의 코스로
+                </h2>
+                <p className="mt-2 max-w-xl break-keep text-lg text-muted-foreground">
+                  장소만 찾지 마세요. 오전엔 파크골프, 오후엔 가까운 온천 —
+                  동선까지 이어 드립니다.
+                </p>
+              </div>
+              <Link
+                href="/course"
+                className="hidden shrink-0 items-center gap-1.5 rounded-xl border-2 border-primary/25 bg-card px-4 py-2.5 text-base font-semibold text-primary transition-colors hover:bg-accent sm:inline-flex"
+              >
+                코스 전체 보기
+                <ArrowRight className="size-4" />
+              </Link>
+            </div>
+
+            <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {courses.map((c) => (
+                <Link
+                  key={c.id}
+                  href={coursePath(c.slug)}
+                  className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  {c.coverImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={c.coverImage.replace(/^http:\/\//, "https://")}
+                      alt=""
+                      loading="lazy"
+                      className="h-36 w-full object-cover"
+                    />
+                  ) : null}
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Car className="size-4 text-primary" />
+                      {c.city ? <span>{c.city}</span> : null}
+                      <span>· 이동 약 {carMinutes(c.totalKm)}분</span>
+                    </div>
+                    <p className="mt-2 flex-1 break-keep text-lg font-bold leading-snug group-hover:text-primary">
+                      {c.title}
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                      {c.stops.map((s, i) => {
+                        const m = CATEGORIES[s.category];
+                        return (
+                          <span key={s.id} className="inline-flex items-center gap-1.5">
+                            {i > 0 ? (
+                              <ArrowRight className="size-3.5 text-muted-foreground" />
+                            ) : null}
+                            <span
+                              className="rounded-full px-2 py-0.5 text-xs font-semibold text-white"
+                              style={{ backgroundColor: m.color }}
+                            >
+                              {m.label}
+                            </span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <Link
+              href="/course"
+              className="mt-6 flex min-h-13 items-center justify-center gap-2 rounded-2xl border-2 border-primary/25 bg-card text-lg font-bold text-primary transition-colors hover:bg-accent sm:hidden"
+            >
+              <Route className="size-5" />
+              나들이 코스 전체 보기
+              <ArrowRight className="size-5" />
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* ============ 사용 방법 ============ */}
       <section className="border-y bg-secondary/50">

@@ -21,11 +21,12 @@ type Row = {
   total_km: number | string | null;
   lat: number | null;
   lng: number | null;
+  cover_image: string | null;
   updated_at: string | null;
 };
 
 const COLS =
-  "id,slug,title,region,city,summary,anchor_id,stops,total_km,lat,lng,updated_at";
+  "id,slug,title,region,city,summary,anchor_id,stops,total_km,lat,lng,cover_image,updated_at";
 
 function toCourse(r: Row): Course {
   return {
@@ -40,6 +41,7 @@ function toCourse(r: Row): Course {
     totalKm: r.total_km != null ? Number(r.total_km) : null,
     lat: r.lat,
     lng: r.lng,
+    coverImage: r.cover_image,
     updatedAt: r.updated_at,
   };
 }

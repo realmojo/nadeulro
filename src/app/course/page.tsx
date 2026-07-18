@@ -107,8 +107,18 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={coursePath(course.slug)}
-      className="group flex h-full flex-col rounded-2xl border bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
+      {course.coverImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={course.coverImage.replace(/^http:\/\//, "https://")}
+          alt=""
+          loading="lazy"
+          className="h-36 w-full object-cover"
+        />
+      ) : null}
+      <div className="flex flex-1 flex-col p-5">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Route className="size-4 text-primary" />
         {course.city ? <span>{course.city}</span> : null}
@@ -136,6 +146,7 @@ function CourseCard({ course }: { course: Course }) {
             </span>
           );
         })}
+      </div>
       </div>
     </Link>
   );

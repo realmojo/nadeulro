@@ -29,6 +29,7 @@ export type Course = {
   totalKm: number | null;
   lat: number | null;
   lng: number | null;
+  coverImage: string | null;
   updatedAt: string | null;
 };
 

@@ -55,6 +55,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${course.title} | ${siteConfig.name}`,
       description,
       url,
+      images: course.coverImage
+        ? [course.coverImage.replace(/^http:\/\//, "https://")]
+        : undefined,
     },
   };
 }
@@ -143,6 +146,15 @@ export default async function CourseDetailPage({ params }: Props) {
           <p className="mt-3 break-keep text-lg leading-relaxed text-foreground/85">
             {course.summary}
           </p>
+        ) : null}
+
+        {course.coverImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={course.coverImage.replace(/^http:\/\//, "https://")}
+            alt={`${course.title} 지도`}
+            className="mt-5 w-full rounded-xl border object-cover"
+          />
         ) : null}
 
         {/* 타임라인 동선 */}
