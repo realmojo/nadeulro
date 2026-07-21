@@ -13,6 +13,9 @@ export function SiteFooter() {
     { title: "온천", href: "/hotspring" },
     { title: "수영장", href: "/swim" },
     { title: "등산", href: "/hiking" },
+    { title: "나들이 코스", href: "/course" },
+    { title: "100대 명산", href: "/mountains-100" },
+    { title: "대형 파크골프장", href: "/parkgolf-large" },
     { title: "블로그", href: "/blog" },
     { title: "이용 가이드", href: "/guide" },
   ];

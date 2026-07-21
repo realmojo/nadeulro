@@ -20,6 +20,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/hiking",
     "/guide",
     "/course",
+    "/mountains-100",
+    "/parkgolf-large",
     "/stay",
     "/about",
     "/contact",
