@@ -63,14 +63,38 @@ export default async function CoursePage() {
       />
 
       <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-        <p className="max-w-2xl break-keep text-lg leading-relaxed text-muted-foreground">
-          전국{" "}
-          <b className="font-bold text-foreground">
-            {courses.length.toLocaleString()}개
-          </b>
-          의 하루 코스입니다. 각 코스는 파크골프장과 <b className="font-semibold text-foreground">차로 가까운 온천</b>을
-          묶어, 몸을 움직이고 따뜻하게 풀어주는 흐름으로 짰습니다.
-        </p>
+        <div className="max-w-2xl space-y-4 break-keep text-lg leading-relaxed text-muted-foreground">
+          <p>
+            전국{" "}
+            <b className="font-bold text-foreground">
+              {courses.length.toLocaleString()}개
+            </b>
+            의 하루 코스입니다. 각 코스는 파크골프장과{" "}
+            <b className="font-semibold text-foreground">차로 가까운 온천</b>을
+            묶어, 몸을 움직이고 따뜻하게 풀어주는 흐름으로 짰습니다.
+          </p>
+          <p>
+            나들이의 아쉬움은 대개 &lsquo;하나만 하고 오는 것&rsquo;입니다. 파크골프
+            한 게임만 치고 돌아오거나, 온천 한 번만 다녀오면 어딘가 허전하죠.
+            나들로의 코스는 <b className="font-semibold text-foreground">오전엔 활동, 오후엔 휴식</b>으로
+            하루를 자연스럽게 채워, 나섰다 돌아올 때의 만족을 다르게 만듭니다.
+          </p>
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {[
+            { t: "동선까지 이어드려요", d: "가까운 장소끼리 묶어, 어디를 어떻게 갈지 고민할 필요가 없습니다." },
+            { t: "이동 시간이 짧아요", d: "장소 사이가 차로 가까워 하루가 여유롭습니다." },
+            { t: "무리 없이 알차게", d: "활동과 온천 휴식이 이어져 어른들의 하루 나들이로 잘 맞습니다." },
+          ].map((f) => (
+            <div key={f.t} className="rounded-2xl border bg-card p-5">
+              <p className="font-display text-lg font-bold">{f.t}</p>
+              <p className="mt-1.5 break-keep text-base leading-relaxed text-muted-foreground">
+                {f.d}
+              </p>
+            </div>
+          ))}
+        </div>
 
         {orderedRegions.map((region) => {
           const list = byRegion.get(region)!;

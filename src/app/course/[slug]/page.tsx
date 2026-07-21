@@ -16,6 +16,13 @@ import {
   fetchCoursesByRegion,
 } from "@/lib/course-server";
 import { carMinutes, coursePath, type Course, type CourseStop } from "@/lib/course";
+import {
+  courseAudience,
+  courseFaqs,
+  courseHowTo,
+  courseIntro,
+  courseTips,
+} from "@/lib/course-content";
 import { CATEGORIES, placeDetailPath } from "@/lib/places";
 import { siteConfig } from "@/lib/site";
 
@@ -76,6 +83,20 @@ export default async function CourseDetailPage({ params }: Props) {
 
   const url = `${siteConfig.url}${coursePath(course.slug)}`;
   const totalMin = carMinutes(course.totalKm);
+  const intro = courseIntro(course);
+  const howTo = courseHowTo(course);
+  const audience = courseAudience(course);
+  const tips = courseTips(course);
+  const faqs = courseFaqs(course);
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -114,6 +135,9 @@ export default async function CourseDetailPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      {faqs.length ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      ) : null}
 
       <article className="mx-auto w-full max-w-2xl px-4 py-6 md:py-10">
         <nav className="flex items-center gap-1.5 text-sm text-muted-foreground" aria-label="위치">
@@ -238,6 +262,104 @@ export default async function CourseDetailPage({ params }: Props) {
             );
           })}
         </ol>
+
+        {/* 이 코스를 추천하는 이유 */}
+        {intro ? (
+          <section className="mt-10">
+            <h2 className="font-display text-xl font-bold md:text-2xl">
+              이 코스를 추천하는 이유
+            </h2>
+            <p className="mt-3 break-keep text-base leading-relaxed text-foreground/85">
+              {intro}
+            </p>
+          </section>
+        ) : null}
+
+        {/* 이렇게 즐겨보세요 */}
+        {howTo.length ? (
+          <section className="mt-8">
+            <h2 className="font-display text-xl font-bold md:text-2xl">
+              이렇게 즐겨보세요
+            </h2>
+            <div className="mt-3 space-y-4">
+              {howTo.map((p, i) => (
+                <p
+                  key={i}
+                  className="break-keep text-base leading-relaxed text-foreground/85"
+                >
+                  {p}
+                </p>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {/* 이런 분께 잘 맞아요 */}
+        <section className="mt-8">
+          <h2 className="font-display text-xl font-bold md:text-2xl">
+            이런 분께 잘 맞아요
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {audience.map((a) => (
+              <li key={a} className="flex gap-2.5">
+                <span
+                  aria-hidden="true"
+                  className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
+                />
+                <span className="break-keep text-base leading-relaxed text-foreground/85">
+                  {a}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* 함께 알아두면 좋은 점 */}
+        <section className="mt-8">
+          <h2 className="font-display text-xl font-bold md:text-2xl">
+            함께 알아두면 좋은 점
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {tips.map((t) => (
+              <li key={t} className="flex gap-2.5">
+                <span
+                  aria-hidden="true"
+                  className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground/50"
+                />
+                <span className="break-keep text-base leading-relaxed text-foreground/85">
+                  {t}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* FAQ */}
+        {faqs.length ? (
+          <section className="mt-8">
+            <h2 className="font-display text-xl font-bold md:text-2xl">
+              자주 묻는 질문
+            </h2>
+            <dl className="mt-3 space-y-3">
+              {faqs.map((f) => (
+                <details
+                  key={f.q}
+                  className="group rounded-xl border bg-card p-4 [&_summary::-webkit-details-marker]:hidden"
+                >
+                  <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-bold">
+                    <dt>{f.q}</dt>
+                    <span className="text-primary transition-transform group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <dd className="mt-2 break-keep text-base leading-relaxed text-muted-foreground">
+                    {f.a}
+                  </dd>
+                </details>
+              ))}
+            </dl>
+          </section>
+        ) : null}
 
         {/* 안내 */}
         <div className="mt-8 rounded-2xl border bg-secondary/40 p-5">
