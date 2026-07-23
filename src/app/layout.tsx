@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Gowun_Batang, IBM_Plex_Mono, IBM_Plex_Sans_KR } from "next/font/google";
+import {
+  Gowun_Batang,
+  IBM_Plex_Mono,
+  IBM_Plex_Sans_KR,
+} from "next/font/google";
 
 import { Analytics } from "@/components/analytics";
 import { BottomNav } from "@/components/bottom-nav";
@@ -65,9 +69,6 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
   },
-  other: {
-    "google-adsense-account": "ca-pub-9745992677443303",
-  },
 };
 
 export const viewport: Viewport = {
@@ -91,6 +92,11 @@ export default function RootLayout({
       className={`${plexSans.variable} ${batang.variable} ${plexMono.variable} h-full`}
       suppressHydrationWarning
     >
+      <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9745992677443303"
+        crossOrigin="anonymous"
+      />
       <body className="flex min-h-full flex-col">
         <a
           href="#main"

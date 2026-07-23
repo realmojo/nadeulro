@@ -26,24 +26,22 @@ export function Analytics() {
       </Script>
 
       {/* 네이버 웹마스터도구 (wcslog) */}
-      <Script
-        src="//wcs.pstatic.net/wcslog.js"
-        strategy="afterInteractive"
-      />
-      <Script id="naver-wcs" strategy="afterInteractive">
-        {`
+      <script src="//wcs.pstatic.net/wcslog.js" />
+      <script
+        id="naver-wcs"
+        dangerouslySetInnerHTML={{
+          __html: `
           if(!window.wcs_add) window.wcs_add = {};
           wcs_add["wa"] = "${NAVER_WA}";
           if(window.wcs) { wcs_do(); }
-        `}
-      </Script>
+        `,
+        }}
+      />
 
       {/* Google AdSense */}
-      <Script
-        id="adsbygoogle-init"
+      <script
         src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
         crossOrigin="anonymous"
-        strategy="afterInteractive"
         async
       />
     </>
