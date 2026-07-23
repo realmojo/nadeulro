@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
   },
   other: {
-    "google-adsense-account": "ca-pub-9130836798889522",
+    "google-adsense-account": "ca-pub-9745992677443303",
   },
 };
 
