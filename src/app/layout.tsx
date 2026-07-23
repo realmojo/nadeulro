@@ -92,11 +92,8 @@ export default function RootLayout({
       className={`${plexSans.variable} ${batang.variable} ${plexMono.variable} h-full`}
       suppressHydrationWarning
     >
-      <script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9745992677443303"
-        crossOrigin="anonymous"
-      />
+      <Analytics />
+
       <body className="flex min-h-full flex-col">
         <a
           href="#main"
@@ -110,7 +107,6 @@ export default function RootLayout({
         </main>
         <SiteFooter />
         <BottomNav />
-        <Analytics />
       </body>
     </html>
   );
