@@ -87,6 +87,7 @@ export function MapScreen({
     hotspring: 0,
     swim: 0,
     hiking: 0,
+    arboretum: 0,
   });
   const [dataError, setDataError] = useState(false);
 

@@ -3,7 +3,12 @@
  * 클라이언트/서버 양쪽에서 안전하게 import 가능 (fetch 없음).
  */
 
-export type PlaceCategory = "parkgolf" | "hotspring" | "swim" | "hiking";
+export type PlaceCategory =
+  | "parkgolf"
+  | "hotspring"
+  | "swim"
+  | "hiking"
+  | "arboretum";
 
 export type PlaceAttributes = {
   /** 파크골프: 홀 수 */
@@ -26,8 +31,14 @@ export type PlaceAttributes = {
   manage_dept?: string;
   /** 등산: 소재지 원문(행정구역 전체) */
   location_raw?: string;
-  /** 등산: 대표 이미지 URL */
+  /** 등산·수목원: 대표 이미지 URL */
   image?: string;
+  /** 수목원: 시설 홈페이지 URL */
+  homepage?: string;
+  /** 수목원: 관광공사 분류코드(cat3) */
+  cat3?: string;
+  /** 수목원: 관광공사 지역코드 */
+  areacode?: string;
   /** 공통: 데이터 출처(도메인) */
   source?: string;
   /** 공통: 출처 원본 식별자 */
@@ -132,6 +143,18 @@ export const CATEGORIES: Record<PlaceCategory, CategoryMeta> = {
     glyph:
       "M9.2 6.2 4 19h6l3.2-8-1.6-4.8c-.4-1.2-2-1.2-2.4 0ZM15.4 9.9 11.8 19H21l-3.4-9.1c-.4-1.1-1.9-1.1-2.2 0Z",
   },
+  arboretum: {
+    key: "arboretum",
+    path: "/arboretum",
+    label: "수목원",
+    short: "수목원",
+    color: "#2c8c7a",
+    colorDeep: "#1c5f52",
+    blurb: "숲과 꽃을 걷는 하루, 전국 수목원·식물원·정원.",
+    // 둥근 수관의 나무 + 줄기
+    glyph:
+      "M18 8A6 6 0 1 0 11 13.92V20a1 1 0 1 0 2 0v-6.08A6 6 0 0 0 18 8Z",
+  },
 };
 
 export const CATEGORY_ORDER: PlaceCategory[] = [
@@ -139,6 +162,7 @@ export const CATEGORY_ORDER: PlaceCategory[] = [
   "hotspring",
   "swim",
   "hiking",
+  "arboretum",
 ];
 
 /** 시도(광역) 목록 — 지역 필터 노출 순서(행정구역 통상 순) */
@@ -163,7 +187,13 @@ export const REGION_ORDER: string[] = [
 ];
 
 export function isPlaceCategory(v: string | null | undefined): v is PlaceCategory {
-  return v === "parkgolf" || v === "hotspring" || v === "swim" || v === "hiking";
+  return (
+    v === "parkgolf" ||
+    v === "hotspring" ||
+    v === "swim" ||
+    v === "hiking" ||
+    v === "arboretum"
+  );
 }
 
 /** 물방울(핀) 형태 마커 SVG — 카테고리 색 + 흰 글리프 */
@@ -236,7 +266,8 @@ export function kakaoDirectionsUrl(p: Place): string {
  * - 시설(파크골프·온천·수영): 연락처가 있어 정보가 완결된 곳만 색인.
  */
 export function isIndexablePlace(p: Place): boolean {
-  if (p.category === "hiking") return true;
+  // 등산·수목원은 원문 소개(개요) 등 고유 콘텐츠가 있어 항상 색인.
+  if (p.category === "hiking" || p.category === "arboretum") return true;
   return Boolean(p.phone && p.phone.trim());
 }
 

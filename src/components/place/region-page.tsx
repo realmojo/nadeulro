@@ -27,6 +27,8 @@ const LEAD: Record<PlaceCategory, (r: string, n: number) => string> = {
     `${r} 지역의 수영장 ${n.toLocaleString()}곳입니다. 가까운 실내·야외 수영장을 찾아 위치를 확인하고 길찾기로 바로 이동할 수 있습니다.`,
   hiking: (r, n) =>
     `${r} 지역의 등산 명소 ${n.toLocaleString()}곳입니다. 산의 높이와 소개, 위치를 확인하고 가볍게 오를 산부터 이름난 명산까지 골라보세요.`,
+  arboretum: (r, n) =>
+    `${r} 지역의 수목원·식물원·정원 ${n.toLocaleString()}곳입니다. 숲길과 꽃정원의 소개와 위치를 확인하고 카카오맵 길찾기로 바로 나들이를 떠나보세요.`,
 };
 
 export async function regionMetadata(

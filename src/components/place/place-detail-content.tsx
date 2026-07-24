@@ -47,7 +47,8 @@ export function PlaceDetailContent({
   heading?: string;
 }) {
   const attr = place.attributes;
-  const reserve = reserveLink(place);
+  // 예약 링크(reserve_url) 우선, 없으면 시설 공식 홈페이지(수목원 등).
+  const externalUrl = reserveLink(place) ?? (attr.homepage?.trim() || null);
   const [copied, setCopied] = useState(false);
   const [descOpen, setDescOpen] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
@@ -245,7 +246,7 @@ export function PlaceDetailContent({
           </Link>
         </div>
 
-        {place.phone || reserve ? (
+        {place.phone || externalUrl ? (
           <div className="grid grid-cols-2 gap-3">
             {place.phone ? (
               <a
@@ -256,9 +257,9 @@ export function PlaceDetailContent({
                 전화하기
               </a>
             ) : null}
-            {reserve ? (
+            {externalUrl ? (
               <a
-                href={reserve}
+                href={externalUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="flex min-h-13 items-center justify-center gap-2 rounded-xl border-2 border-primary/25 bg-card px-3 text-base font-semibold text-primary transition-colors hover:bg-accent"

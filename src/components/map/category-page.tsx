@@ -11,7 +11,12 @@ import {
 } from "@/lib/places";
 import { fetchPlaces } from "@/lib/places-server";
 import { fetchPosts } from "@/lib/blog-server";
-import { blogCategoryPath, blogPostPath, type BlogPost } from "@/lib/blog";
+import {
+  blogCategoryPath,
+  blogPostPath,
+  isBlogCategory,
+  type BlogPost,
+} from "@/lib/blog";
 import { siteConfig } from "@/lib/site";
 
 /** 우측 패널용 카테고리 FAQ */
@@ -31,6 +36,10 @@ const SIDE_FAQ: Record<PlaceCategory, Array<{ q: string; a: string }>> = {
   hiking: [
     { q: "초보도 오를 산이 있나요?", a: "낮고 완만한 산부터 시작하세요. 각 산 상세페이지에서 높이와 소개를 확인할 수 있습니다." },
     { q: "100대 명산은 어떻게 찾나요?", a: "등산 목록에서 100대 명산은 별도로 표시됩니다. 가까운 명산부터 도전해 보세요." },
+  ],
+  arboretum: [
+    { q: "입장료가 있나요?", a: "국공립 수목원은 무료이거나 소액입니다. 사립 수목원·정원은 곳마다 다르니 상세페이지의 홈페이지·연락처에서 확인하세요." },
+    { q: "언제 가면 좋나요?", a: "봄꽃과 가을 단풍철이 특히 좋습니다. 온실이 있는 곳은 겨울에도 걷기 좋아요. 각 상세페이지에서 소개를 확인하세요." },
   ],
 };
 
@@ -66,6 +75,13 @@ const SEO: Record<
       "전국 산·봉우리 등산 명소의 위치를 카카오맵에서 한눈에. 동네 뒷산부터 이름난 명산까지 가볍게 올라보세요.",
     intro:
       "동네 뒷산부터 이름난 명산까지, 전국 등산 명소를 지도에서 찾아보세요. 위치를 확인하고 카카오맵 길찾기로 들머리까지 바로 이동할 수 있습니다.",
+  },
+  arboretum: {
+    title: "전국 수목원·식물원 지도",
+    description:
+      "전국 수목원·식물원·정원의 위치를 카카오맵에서 한눈에. 소개·홈페이지·연락처를 확인하고 길찾기로 바로 출발하세요.",
+    intro:
+      "숲길과 꽃정원을 천천히 걷기 좋은 전국 수목원·식물원·정원을 지도에서 찾아보세요. 위치와 소개를 확인하고 카카오맵 길찾기로 바로 이동할 수 있습니다.",
   },
 };
 
@@ -114,11 +130,15 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
     /* SEO 보조 콘텐츠 없이도 지도는 뜬다 */
   }
 
+  // 블로그가 있는 카테고리만 최근 글을 곁들인다(수목원 등은 글이 없어 생략).
+  const blogCat = isBlogCategory(category) ? category : null;
   let posts: BlogPost[] = [];
-  try {
-    posts = await fetchPosts({ category, limit: 3 });
-  } catch {
-    /* 블로그 조회 실패 시 해당 섹션만 생략 */
+  if (blogCat) {
+    try {
+      posts = await fetchPosts({ category: blogCat, limit: 3 });
+    } catch {
+      /* 블로그 조회 실패 시 해당 섹션만 생략 */
+    }
   }
 
   const sidePanel = (
@@ -154,12 +174,12 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
         </section>
       ) : null}
 
-      {posts.length > 0 ? (
+      {blogCat && posts.length > 0 ? (
         <section className="mt-6">
           <div className="flex items-baseline justify-between">
             <h3 className="text-sm font-bold text-foreground/80">나들이 이야기</h3>
             <Link
-              href={blogCategoryPath(category)}
+              href={blogCategoryPath(blogCat)}
               className="text-xs font-semibold text-primary hover:underline"
             >
               전체 보기

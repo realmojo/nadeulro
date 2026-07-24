@@ -14,6 +14,7 @@ export async function GET() {
     hotspring: 0,
     swim: 0,
     hiking: 0,
+    arboretum: 0,
   };
   try {
     counts = (await fetchPlaces()).counts;

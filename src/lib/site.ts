@@ -51,6 +51,11 @@ export const mainNav: NavItem[] = [
     description: "동네 뒷산부터 명산까지 가볍게.",
   },
   {
+    title: "수목원",
+    href: "/arboretum",
+    description: "전국 수목원·식물원·정원을 지도에서.",
+  },
+  {
     title: "블로그",
     href: "/blog",
     description: "파크골프·온천·수영·등산 나들이 이야기.",

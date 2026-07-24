@@ -3,7 +3,15 @@
  */
 import { CATEGORIES, type PlaceCategory } from "@/lib/places";
 
-export type BlogCategory = PlaceCategory;
+// 블로그는 글이 존재하는 4종만 다룬다(수목원 등 신규 장소 카테고리는 제외).
+export type BlogCategory = Exclude<PlaceCategory, "arboretum">;
+
+/** 블로그를 가진 카테고리인지(수목원 등 신규 장소 카테고리 제외). 문자열 라우트 파라미터도 검증. */
+export function isBlogCategory(c: string | null | undefined): c is BlogCategory {
+  return (
+    c === "parkgolf" || c === "hotspring" || c === "swim" || c === "hiking"
+  );
+}
 
 export type BlogPost = {
   id: number;

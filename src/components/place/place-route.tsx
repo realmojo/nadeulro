@@ -33,6 +33,7 @@ const SCHEMA_TYPE: Record<PlaceCategory, string> = {
   swim: "SportsActivityLocation",
   hotspring: "DaySpa",
   hiking: "TouristAttraction",
+  arboretum: "TouristAttraction",
 };
 
 /** PostalAddress 구조화 */

@@ -49,6 +49,7 @@
   --cat-hotspring: oklch(0.58 0.16 38);
   --cat-swim: oklch(0.52 0.11 245);
   --cat-hiking: oklch(0.5 0.08 75);
+  --cat-arboretum: oklch(0.53 0.1 178);
 
   --chart-1: oklch(0.55 0.13 150);
   --chart-2: oklch(0.63 0.11 128);
@@ -100,6 +101,7 @@
   --cat-hotspring: oklch(0.7 0.15 40);
   --cat-swim: oklch(0.68 0.11 245);
   --cat-hiking: oklch(0.68 0.08 80);
+  --cat-arboretum: oklch(0.68 0.1 180);
 
   --chart-1: oklch(0.63 0.14 150);
   --chart-2: oklch(0.68 0.11 128);
@@ -143,6 +145,7 @@
   --color-cat-hotspring: var(--cat-hotspring);
   --color-cat-swim: var(--cat-swim);
   --color-cat-hiking: var(--cat-hiking);
+  --color-cat-arboretum: var(--cat-arboretum);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);

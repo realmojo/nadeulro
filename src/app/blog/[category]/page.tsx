@@ -8,10 +8,11 @@ import {
   BLOG_CATEGORY_SEO,
   blogCategoryLabel,
   blogCategoryPath,
+  isBlogCategory,
   type BlogCategory,
 } from "@/lib/blog";
 import { fetchPosts, blogCounts } from "@/lib/blog-server";
-import { CATEGORIES, isPlaceCategory } from "@/lib/places";
+import { CATEGORIES } from "@/lib/places";
 import { siteConfig } from "@/lib/site";
 
 export const revalidate = 600;
@@ -27,7 +28,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
-  if (!isPlaceCategory(category)) return {};
+  if (!isBlogCategory(category)) return {};
   const seo = BLOG_CATEGORY_SEO[category];
   const url = `${siteConfig.url}${blogCategoryPath(category)}`;
   return {
@@ -40,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogCategoryPage({ params }: Props) {
   const { category } = await params;
-  if (!isPlaceCategory(category)) notFound();
+  if (!isBlogCategory(category)) notFound();
 
   const seo = BLOG_CATEGORY_SEO[category];
   const label = blogCategoryLabel(category);

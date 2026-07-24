@@ -10,10 +10,11 @@ import {
   blogCategoryPath,
   blogCategoryColor,
   blogPostPath,
+  isBlogCategory,
   type BlogCategory,
 } from "@/lib/blog";
 import { fetchPost, fetchPosts, fetchAllPublished } from "@/lib/blog-server";
-import { CATEGORIES, isPlaceCategory } from "@/lib/places";
+import { CATEGORIES } from "@/lib/places";
 import { siteConfig } from "@/lib/site";
 
 export const revalidate = 600;
@@ -40,7 +41,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params;
-  if (!isPlaceCategory(category)) return {};
+  if (!isBlogCategory(category)) return {};
   const post = await fetchPost(category, decodeURIComponent(slug)).catch(() => null);
   if (!post) return { title: "글을 찾을 수 없습니다", robots: { index: false } };
   const url = `${siteConfig.url}${blogPostPath(category, post.slug)}`;
@@ -66,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { category, slug } = await params;
-  if (!isPlaceCategory(category)) notFound();
+  if (!isBlogCategory(category)) notFound();
   const cat = category as BlogCategory;
 
   const post = await fetchPost(cat, decodeURIComponent(slug));

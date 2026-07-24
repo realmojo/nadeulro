@@ -297,6 +297,7 @@ export async function fetchPlaces(): Promise<PlacesPayload> {
     hotspring: 0,
     swim: 0,
     hiking: 0,
+    arboretum: 0,
   };
   for (const p of places) counts[p.category] += 1;
 
