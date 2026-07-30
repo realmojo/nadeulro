@@ -2,13 +2,16 @@ import Link from "next/link";
 import {
   ArrowLeft,
   Award,
+  BarChart3,
   CheckCircle2,
+  Compass,
   ExternalLink,
   Info,
   ListChecks,
   MapPin,
   Navigation,
   Phone,
+  Route,
 } from "lucide-react";
 
 import {
@@ -23,7 +26,6 @@ import {
 import {
   buildFaqs,
   checklist,
-  closing,
   contactNote,
   disclaimer,
   facilityRows,
@@ -31,6 +33,17 @@ import {
   usageIntro,
   usageNotes,
 } from "@/lib/place-seo";
+import {
+  coursePairing,
+  formatDistance,
+  nearestLines,
+  radiusBreakdown,
+  radiusSummary,
+  rankSentence,
+  scarcityNote,
+  tempNote,
+} from "@/lib/place-facts";
+import { DESCENT_BUFFER_MIN, daylightExtremes, monthlySun } from "@/lib/sun";
 import type { RelatedPlaces } from "@/lib/places-server";
 
 /**
@@ -67,6 +80,25 @@ export function PlaceArticle({
     .split(/\n+/)
     .map((s) => s.trim())
     .filter(Boolean);
+  // 좌표·공개 수치에서 계산한 값 — 이 페이지에만 있는 정보
+  const { radius, rank } = related;
+  const breakdown = radius ? radiusBreakdown(radius) : [];
+  const nearest = radius ? nearestLines(radius) : [];
+  const pairing = radius ? coursePairing(place, radius) : null;
+  const temp = tempNote(place);
+  // 산은 좌표로 일몰을 계산 — 산마다 실제로 다른 값이 나온다
+  const sunRows =
+    place.category === "hiking" && place.lat != null && place.lng != null
+      ? monthlySun(place.lat, place.lng, new Date().getFullYear())
+      : [];
+  const extremes = daylightExtremes(sunRows);
+  // 등산·수목원 본문은 공공기관 원문이라 출처를 밝힌다
+  const sourceLabel =
+    place.category === "hiking"
+      ? { name: "산림청", href: "https://www.forest.go.kr" }
+      : place.category === "arboretum"
+        ? { name: "한국관광공사", href: "https://knto.or.kr" }
+        : null;
 
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-4 md:py-8">
@@ -111,11 +143,12 @@ export function PlaceArticle({
           {a.subtitle}
         </p>
       ) : null}
-      {place.category !== "hiking" && place.description ? (
-        <p className="mt-3 break-keep text-lg leading-relaxed text-foreground/85">
-          {place.description}
-        </p>
-      ) : null}
+      {/*
+        파크골프·온천·수영장의 description 은 "○○에 위치한 수영장입니다" 식
+        자동생성 문장이라 바로 아래 시설 정보 표와 내용이 겹친다. 분량만 늘리고
+        정보를 더하지 않으므로 본문에는 싣지 않는다.
+        수목원 원문(관광공사)은 실제 소개글이므로 아래 '소개' 섹션에서 출처와 함께.
+      */}
 
       {/* 핵심 행동 버튼 */}
       <div className="mt-5 grid gap-3">
@@ -177,14 +210,130 @@ export function PlaceArticle({
         ) : null}
       </Section>
 
-      {/* 등산: 산 소개(원문) */}
-      {place.category === "hiking" && hikingParas.length ? (
-        <Section title="산 소개">
-          <div className="space-y-4 break-keep text-base leading-[1.9] text-foreground/85">
+      {/* 온천: 수온 숫자만으로는 모르는 가온 여부 */}
+      {temp ? (
+        <Section title="이 온천의 물">
+          <p className="break-keep text-base leading-relaxed text-foreground/85">
+            {temp}
+          </p>
+        </Section>
+      ) : null}
+
+      {/* 나들이 반경 — 좌표로 계산한 이 장소만의 정보 */}
+      {radius && radius.total > 0 ? (
+        <Section title={`반경 ${radius.km}km 나들이 반경`}>
+          <p className="break-keep text-base leading-relaxed text-foreground/85">
+            {radiusSummary(place, radius)}
+          </p>
+          <p className="mt-2 break-keep text-base leading-relaxed text-foreground/85">
+            {scarcityNote(place, radius)}
+          </p>
+
+          <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {breakdown.map((b) => (
+              <li
+                key={b.category}
+                className="rounded-xl border border-border/70 bg-card px-3 py-2.5"
+              >
+                <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <span
+                    aria-hidden="true"
+                    className="size-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: CATEGORIES[b.category].color }}
+                  />
+                  {b.label}
+                </span>
+                <span className="mt-0.5 block text-xl font-bold tabular-nums">
+                  {b.count}
+                  <span className="ml-0.5 text-base font-semibold text-foreground/70">
+                    곳
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {nearest.length ? (
+            <>
+              <h3 className="mt-6 flex items-center gap-1.5 text-lg font-bold">
+                <Compass className="size-5 text-primary/70" />
+                가장 가까운 곳
+              </h3>
+              <ul className="mt-2 divide-y divide-border rounded-xl border border-border/70">
+                {nearest.map((n) => (
+                  <li key={n.place.id}>
+                    <Link
+                      href={placeDetailPath(n.place.category, n.place.slug)}
+                      className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-accent/40"
+                    >
+                      <span className="w-16 shrink-0 text-sm text-muted-foreground">
+                        {n.label}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-semibold">
+                          {n.place.name}
+                        </span>
+                        <span className="block text-sm text-muted-foreground">
+                          {formatDistance(n.km)}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+
+          {pairing ? (
+            <div className="mt-4 rounded-xl border border-primary/25 bg-primary/5 p-4">
+              <p className="flex items-center gap-1.5 text-sm font-bold text-primary">
+                <Route className="size-4" />
+                하루 코스로 묶는다면
+              </p>
+              <p className="mt-1.5 break-keep text-base leading-relaxed text-foreground/85">
+                {pairing.sentence}
+              </p>
+            </div>
+          ) : null}
+        </Section>
+      ) : null}
+
+      {/* 지역 내 순위 — 공개 수치가 있는 카테고리만 */}
+      {rank ? (
+        <Section title="지역 안에서의 규모">
+          <div className="rounded-xl border border-border/70 bg-muted/40 p-4">
+            <p className="flex items-center gap-1.5 text-sm font-bold text-foreground/80">
+              <BarChart3 className="size-4 text-primary/70" />
+              {place.region} {label} {rank.total}곳 중 {rank.metric} {rank.position}위
+            </p>
+            <p className="mt-1.5 break-keep text-base leading-relaxed text-foreground/85">
+              {rankSentence(place, rank)}
+            </p>
+          </div>
+        </Section>
+      ) : null}
+
+      {/* 등산·수목원: 공공기관 원문 소개 (출처 명시) */}
+      {sourceLabel && hikingParas.length ? (
+        <Section title={place.category === "hiking" ? "산 소개" : "수목원 소개"}>
+          <blockquote className="space-y-4 break-keep border-l-4 border-border pl-4 text-base leading-[1.9] text-foreground/85">
             {hikingParas.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
-          </div>
+          </blockquote>
+          <p className="mt-3 text-sm text-muted-foreground">
+            위 소개글은{" "}
+            <a
+              href={sourceLabel.href}
+              target="_blank"
+              rel="noreferrer nofollow"
+              className="font-semibold text-primary hover:underline"
+            >
+              {sourceLabel.name}
+            </a>
+            에서 공개한 자료를 인용한 것입니다. 아래 일몰·주변 정보는 나들로가
+            좌표를 바탕으로 계산했습니다.
+          </p>
           {isTop100(place) ? (
             <div className="mt-4 rounded-xl border border-persimmon/25 bg-persimmon/5 p-4">
               <p className="flex items-center gap-1.5 text-sm font-bold text-persimmon">
@@ -196,6 +345,69 @@ export function PlaceArticle({
               </p>
             </div>
           ) : null}
+        </Section>
+      ) : null}
+
+      {/* 등산: 이 산 좌표로 계산한 월별 일몰과 하산 역산 */}
+      {sunRows.length && extremes ? (
+        <Section title="산행 시간 계획 — 이 산의 일몰 시각">
+          <p className="break-keep text-base leading-relaxed text-foreground/85">
+            {place.name}의 좌표({place.lat!.toFixed(3)}, {place.lng!.toFixed(3)})
+            기준으로 계산한 월별 일출·일몰입니다. 해가 가장 짧은{" "}
+            {extremes.shortest.month}월에는 {extremes.shortest.sunset}에,
+            가장 긴 {extremes.longest.month}월에는 {extremes.longest.sunset}에
+            해가 집니다. 산속은 능선에 해가 가리면 일몰 전부터 어두워지므로,
+            아래 &lsquo;하산 시작&rsquo;은 일몰 {DESCENT_BUFFER_MIN}분 전으로
+            잡았습니다.
+          </p>
+
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[20rem] border-collapse text-base">
+              <thead>
+                <tr className="border-b border-border text-left text-sm text-muted-foreground">
+                  <th scope="col" className="py-2 pr-2 font-medium">
+                    월
+                  </th>
+                  <th scope="col" className="py-2 pr-2 font-medium">
+                    일출
+                  </th>
+                  <th scope="col" className="py-2 pr-2 font-medium">
+                    일몰
+                  </th>
+                  <th scope="col" className="py-2 font-medium text-primary">
+                    하산 시작
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sunRows.map((r) => (
+                  <tr key={r.month} className="border-b border-border/50">
+                    <th
+                      scope="row"
+                      className="py-2 pr-2 text-left font-semibold tabular-nums"
+                    >
+                      {r.month}월
+                    </th>
+                    <td className="py-2 pr-2 tabular-nums text-foreground/80">
+                      {r.sunrise}
+                    </td>
+                    <td className="py-2 pr-2 tabular-nums text-foreground/80">
+                      {r.sunset}
+                    </td>
+                    <td className="py-2 font-bold tabular-nums text-primary">
+                      {r.turnBack}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="mt-3 break-keep text-sm leading-relaxed text-muted-foreground">
+            각 달 15일 기준으로 계산한 값이며, 같은 달 안에서 며칠 차이는
+            몇 분 수준입니다. 실제 체감 일몰은 산의 방향과 골짜기 지형에 따라
+            표보다 이를 수 있습니다.
+          </p>
         </Section>
       ) : null}
 
@@ -313,25 +525,18 @@ export function PlaceArticle({
         </Section>
       ) : null}
 
-      {/* 마치며 */}
-      <Section title="마치며">
-        <p className="break-keep text-base leading-relaxed text-foreground/85">
-          {closing(place)}
-        </p>
-      </Section>
-
       {/* 내부링크: 같은 지역 + 가까운 곳 */}
       {related.sameRegion.length ? (
         <RelatedList
           title={`${place.region} ${label} 더 보기`}
-          places={related.sameRegion}
+          items={related.sameRegion.map((p) => ({ place: p }))}
           showCat={false}
         />
       ) : null}
       {related.nearby.length ? (
         <RelatedList
           title="가까운 나들이 스팟"
-          places={related.nearby}
+          items={related.nearby}
           showCat
         />
       ) : null}
@@ -360,18 +565,19 @@ function Section({
 
 function RelatedList({
   title,
-  places,
+  items,
   showCat,
 }: {
   title: string;
-  places: Place[];
+  /** km 이 있으면 거리·소요시간을 함께 보여준다 */
+  items: Array<{ place: Place; km?: number }>;
   showCat: boolean;
 }) {
   return (
     <section className="mt-8">
       <h2 className="font-display text-xl font-bold md:text-2xl">{title}</h2>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-        {places.map((p) => {
+        {items.map(({ place: p, km }) => {
           const m = CATEGORIES[p.category];
           return (
             <li key={p.id}>
@@ -388,7 +594,9 @@ function RelatedList({
                   <span className="block truncate font-semibold">{p.name}</span>
                   <span className="block truncate text-sm text-muted-foreground">
                     {showCat ? `${m.label} · ` : ""}
-                    {[p.region, p.city].filter(Boolean).join(" ")}
+                    {km != null
+                      ? formatDistance(km)
+                      : [p.region, p.city].filter(Boolean).join(" ")}
                   </span>
                 </span>
               </Link>

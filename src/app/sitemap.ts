@@ -4,8 +4,9 @@ import { blogPostPath } from "@/lib/blog";
 import { fetchAllPublished } from "@/lib/blog-server";
 import { coursePath } from "@/lib/course";
 import { fetchCourses } from "@/lib/course-server";
+import { nearPath } from "@/lib/near";
 import { isIndexablePlace, placeDetailPath, regionPath } from "@/lib/places";
-import { fetchPlaces } from "@/lib/places-server";
+import { fetchSitemapPlaces } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
 
 export const revalidate = 86400;
@@ -22,6 +23,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/course",
     "/mountains-100",
     "/parkgolf-large",
+    "/arboretum",
+    "/near",
     "/stay",
     "/about",
     "/contact",
@@ -49,12 +52,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             : 0.7,
   }));
 
-  // 장소 상세 페이지 + 지역 랜딩 페이지
+  // 장소 상세 페이지 + 지역 랜딩 페이지 + 시군구 허브
   let placeEntries: MetadataRoute.Sitemap = [];
   const regionEntries: MetadataRoute.Sitemap = [];
+  const cityEntries: MetadataRoute.Sitemap = [];
   try {
-    const { places } = await fetchPlaces();
-    // 연락처 없는 시설 페이지(정보 불완전)는 사이트맵에서 제외 — 색인 품질 관리
+    // 색인 판정이 본문 길이를 보므로 description 을 포함한 목록을 쓴다
+    const places = await fetchSitemapPlaces();
+    // 정보가 불완전하거나 본문이 stub 인 페이지는 제외 — 색인 품질 관리
     placeEntries = places.filter(isIndexablePlace).map((p) => ({
       url: `${siteConfig.url}${placeDetailPath(p.category, p.slug)}`,
       changeFrequency: "monthly",
@@ -63,13 +68,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // (카테고리 × 존재하는 지역) 조합만
     const seen = new Set<string>();
+    // 시군구 허브는 카테고리가 2종 이상일 때만 (1종이면 지역 페이지와 중복)
+    const cityCats = new Map<string, Set<string>>();
     for (const p of places) {
       if (!p.region) continue;
       const key = `${p.category}:${p.region}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      regionEntries.push({
-        url: `${siteConfig.url}${regionPath(p.category, p.region)}`,
+      if (!seen.has(key)) {
+        seen.add(key);
+        regionEntries.push({
+          url: `${siteConfig.url}${regionPath(p.category, p.region)}`,
+          changeFrequency: "weekly",
+          priority: 0.8,
+        });
+      }
+      if (p.city) {
+        const ck = `${p.region}|${p.city}`;
+        if (!cityCats.has(ck)) cityCats.set(ck, new Set());
+        cityCats.get(ck)!.add(p.category);
+      }
+    }
+
+    for (const [ck, cats] of cityCats) {
+      if (cats.size < 2) continue;
+      const [region, city] = ck.split("|");
+      cityEntries.push({
+        url: `${siteConfig.url}${nearPath(region, city)}`,
         changeFrequency: "weekly",
         priority: 0.8,
       });
@@ -109,6 +132,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticEntries,
     ...courseEntries,
+    ...cityEntries,
     ...regionEntries,
     ...blogEntries,
     ...placeEntries,

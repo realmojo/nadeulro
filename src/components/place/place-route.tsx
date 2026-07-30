@@ -15,6 +15,7 @@ import {
   fetchPlaceByName,
   fetchPlaceBySlug,
   fetchRelated,
+  type RelatedPlaces,
 } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
 
@@ -108,7 +109,12 @@ export async function PlaceDetailRoute({
   const place = await resolvePlace(category, title);
   if (!place) notFound();
 
-  let related = { sameRegion: [] as Place[], nearby: [] as Place[] };
+  let related: RelatedPlaces = {
+    sameRegion: [],
+    nearby: [],
+    radius: null,
+    rank: null,
+  };
   try {
     related = await fetchRelated(place);
   } catch {
@@ -121,7 +127,12 @@ export async function PlaceDetailRoute({
     "@context": "https://schema.org",
     "@type": SCHEMA_TYPE[category],
     name: place.name,
-    description: place.description ?? place.attributes.subtitle ?? undefined,
+    // 시설 카테고리의 description 은 본문에 싣지 않는 자동생성 문장이라
+    // 구조화 데이터에도 넣지 않는다(페이지에 없는 내용을 설명으로 쓰지 않기).
+    description:
+      place.category === "hiking" || place.category === "arboretum"
+        ? (place.description ?? undefined)
+        : (place.attributes.subtitle ?? undefined),
     url,
     ...(place.address ? { address: postalAddress(place) } : {}),
     ...(place.phone ? { telephone: place.phone } : {}),

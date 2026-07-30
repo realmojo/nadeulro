@@ -31,6 +31,11 @@ export const mainNav: NavItem[] = [
     description: "파크골프 + 가까운 온천을 하루 코스로.",
   },
   {
+    title: "동네별 나들이",
+    href: "/near",
+    description: "우리 동네에 무엇이 있고 무엇을 하루에 묶을 수 있는지.",
+  },
+  {
     title: "파크골프장",
     href: "/parkgolf",
     description: "전국 파크골프장 위치·홀수·연락처.",
