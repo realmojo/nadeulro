@@ -8,6 +8,7 @@ import { nearPath } from "@/lib/near";
 import { isIndexablePlace, placeDetailPath, regionPath } from "@/lib/places";
 import { fetchSitemapPlaces } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
+import { TOOLS, TOOLS_INDEX } from "@/lib/tools";
 
 export const revalidate = 86400;
 
@@ -25,6 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/parkgolf-large",
     "/arboretum",
     "/near",
+    TOOLS_INDEX.path,
+    ...TOOLS.map((t) => t.path),
     "/stay",
     "/about",
     "/contact",
