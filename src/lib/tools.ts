@@ -2,7 +2,13 @@
  * 나들로 무료 도구 — 메타데이터 한 곳 정의.
  * 사이트맵·내비·도구 목록 페이지가 모두 여기를 참조한다(경로 중복 정의 방지).
  */
-export type ToolKey = "parkgolf-score" | "hiking-time" | "course-maker";
+export type ToolKey =
+  | "nearby"
+  | "parkgolf-score"
+  | "hiking-time"
+  | "hiking-pace"
+  | "weather-safety"
+  | "course-maker";
 
 export type Tool = {
   key: ToolKey;
@@ -20,6 +26,16 @@ export type Tool = {
 };
 
 export const TOOLS: Tool[] = [
+  {
+    key: "nearby",
+    path: "/tools/nearby",
+    title: "가까운 나들이 찾기",
+    metaTitle: "가까운 나들이 찾기 — 내 위치 기준 반경 검색",
+    blurb: "지금 있는 곳에서 정해진 거리 안에 있는 나들이 스팟을 찾습니다.",
+    description:
+      "현재 위치나 지역을 기준으로 반경을 정하면 그 안의 파크골프장·온천·수영장·산·수목원을 가까운 순서로 보여줍니다. 각각까지의 거리와 차로 걸리는 시간을 함께 계산합니다.",
+    when: "갑자기 시간이 비었을 때",
+  },
   {
     key: "parkgolf-score",
     path: "/tools/parkgolf-score",
@@ -39,6 +55,26 @@ export const TOOLS: Tool[] = [
     description:
       "전국 산 1,300여 곳의 좌표로 그날의 일몰 시각을 계산해, 어두워지기 전에 내려오려면 몇 시에 출발해야 하는지 역산합니다. 계절마다 답이 달라집니다.",
     when: "산에 가기 전날 밤이나 당일 아침에",
+  },
+  {
+    key: "hiking-pace",
+    path: "/tools/hiking-pace",
+    title: "산행 소요 시간 계산기",
+    metaTitle: "산행 소요 시간 계산기 — 거리·고도로 계산",
+    blurb: "거리와 고도 상승을 넣으면 실제로 몇 시간 걸릴지 계산합니다.",
+    description:
+      "네이스미스 규칙에 하강 보정·페이스·배낭 무게·휴식 시간을 더해 산행 소요 시간을 추정합니다. 계산한 시간은 출발 시각 계산기로 그대로 넘겨 일몰까지 역산할 수 있습니다.",
+    when: "코스를 고르고 일정을 가늠할 때",
+  },
+  {
+    key: "weather-safety",
+    path: "/tools/weather-safety",
+    title: "야외 활동 날씨 안전 계산기",
+    metaTitle: "야외 활동 날씨 안전 계산기 — 열지수·체감온도",
+    blurb: "기온에 습도와 바람을 더해 오늘 나가도 되는지 판단합니다.",
+    description:
+      "여름은 열지수, 겨울은 체감온도를 기상청 표준식으로 계산해 온열질환·동상 위험을 알려드립니다. 기온만 보고 판단하기 어려운 날에 활동 여부를 정하는 데 쓰세요.",
+    when: "나가기 전 오늘 날씨가 애매할 때",
   },
   {
     key: "course-maker",

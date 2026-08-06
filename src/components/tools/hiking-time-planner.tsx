@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, Mountain, Sunrise, Sunset } from "lucide-react";
 
@@ -37,6 +37,25 @@ export function HikingTimePlanner() {
   const [mountain, setMountain] = useState<ToolPlace | null>(null);
   const [date, setDate] = useState<string>(todayISO());
   const [duration, setDuration] = useState<number>(180);
+  /** 소요 시간 계산기에서 넘어온 값 — 목록에 없는 시간이면 항목으로 추가한다 */
+  const [handoff, setHandoff] = useState<number | null>(null);
+
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("minutes");
+    const m = Math.round(Number(raw));
+    if (!Number.isFinite(m) || m < 30 || m > 900) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 외부 상태(주소창 쿼리) 복원
+    setDuration(m);
+    if (!DURATION_OPTIONS.includes(m)) setHandoff(m);
+  }, []);
+
+  const durationOptions = useMemo(
+    () =>
+      handoff
+        ? [...DURATION_OPTIONS, handoff].sort((a, b) => a - b)
+        : DURATION_OPTIONS,
+    [handoff],
+  );
 
   const result = useMemo(() => {
     if (!mountain) return null;
@@ -121,7 +140,7 @@ export function HikingTimePlanner() {
               onChange={(e) => setDuration(Number(e.target.value))}
               className="mt-2 h-11 w-full rounded-md border border-input bg-background px-3 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              {DURATION_OPTIONS.map((m) => (
+              {durationOptions.map((m) => (
                 <option key={m} value={m}>
                   {durationLabel(m)}
                 </option>
