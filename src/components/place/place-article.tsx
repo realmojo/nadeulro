@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Compass,
   ExternalLink,
+  FileCheck2,
   Info,
   ListChecks,
   MapPin,
@@ -36,11 +37,13 @@ import {
 import {
   coursePairing,
   formatDistance,
+  formatUpdatedAt,
   nearestLines,
   radiusBreakdown,
   radiusSummary,
   rankSentence,
   scarcityNote,
+  sourceNote,
   tempNote,
 } from "@/lib/place-facts";
 import { DESCENT_BUFFER_MIN, daylightExtremes, monthlySun } from "@/lib/sun";
@@ -86,6 +89,8 @@ export function PlaceArticle({
   const nearest = radius ? nearestLines(radius) : [];
   const pairing = radius ? coursePairing(place, radius) : null;
   const temp = tempNote(place);
+  const source = sourceNote(place);
+  const updatedLabel = formatUpdatedAt(place.updatedAt);
   // 산은 좌표로 일몰을 계산 — 산마다 실제로 다른 값이 나온다
   const sunRows =
     place.category === "hiking" && place.lat != null && place.lng != null
@@ -541,9 +546,50 @@ export function PlaceArticle({
         />
       ) : null}
 
-      <p className="mt-8 break-keep rounded-lg bg-secondary/60 p-3 text-sm leading-relaxed text-muted-foreground">
-        {disclaimer(place)}
-      </p>
+      {/* 정보 기준 — 출처와 갱신 시점을 밝혀야 이용자가 신뢰 여부를 판단할 수 있다 */}
+      <section className="mt-8 rounded-xl border border-border/70 bg-muted/40 p-4">
+        <h2 className="flex items-center gap-1.5 text-base font-bold text-foreground/90">
+          <FileCheck2 className="size-4 text-primary/70" />
+          정보 기준
+        </h2>
+        <dl className="mt-2 space-y-1.5 text-sm leading-relaxed text-muted-foreground">
+          <div className="flex gap-2">
+            <dt className="w-20 shrink-0">자료 출처</dt>
+            <dd className="flex-1 text-foreground/80">
+              {source.href ? (
+                <a
+                  href={source.href}
+                  target="_blank"
+                  rel="noreferrer nofollow"
+                  className="font-semibold text-primary hover:underline"
+                >
+                  {source.label}
+                </a>
+              ) : (
+                source.label
+              )}
+            </dd>
+          </div>
+          {updatedLabel ? (
+            <div className="flex gap-2">
+              <dt className="w-20 shrink-0">최근 갱신</dt>
+              <dd className="flex-1 text-foreground/80">{updatedLabel}</dd>
+            </div>
+          ) : null}
+          <div className="flex gap-2">
+            <dt className="w-20 shrink-0">계산 정보</dt>
+            <dd className="flex-1 text-foreground/80">
+              {place.category === "hiking"
+                ? "반경·거리·순위·일몰 시각은"
+                : "반경·거리·순위는"}{" "}
+              좌표를 바탕으로 나들로가 계산했습니다.
+            </dd>
+          </div>
+        </dl>
+        <p className="mt-3 break-keep text-sm leading-relaxed text-muted-foreground">
+          {disclaimer(place)}
+        </p>
+      </section>
     </article>
   );
 }

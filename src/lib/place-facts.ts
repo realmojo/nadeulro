@@ -164,6 +164,31 @@ export function tempNote(place: Place): string | null {
   return `원천 수온 ${v}℃로 높은 편입니다. 원천 그대로는 뜨거워 물을 섞어 온도를 낮춰 공급하며, 고혈압·심장질환이 있다면 장시간 입욕은 피하는 편이 좋습니다.`;
 }
 
+/**
+ * 자료 출처 표기 — 이 페이지의 정보가 어디서 왔는지.
+ * 없는 출처를 지어내지 않는다. 시설 3종은 attributes.source 가 비어 있어
+ * 개별 기관을 특정할 수 없으므로 수집 경로만 사실대로 적는다.
+ */
+export function sourceNote(place: Place): { label: string; href?: string } {
+  const src = place.attributes.source;
+  if (place.category === "hiking") {
+    return { label: "산림청 공개 자료", href: "https://www.forest.go.kr" };
+  }
+  if (place.category === "arboretum") {
+    return { label: "한국관광공사 공개 자료", href: "https://knto.or.kr" };
+  }
+  if (src) return { label: `${src} 공개 자료` };
+  return { label: "지방자치단체·공공기관 공개 자료" };
+}
+
+/** ISO 시각 → "2026년 7월 24일" (없으면 null) */
+export function formatUpdatedAt(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
 /** 지역 내 순위 문장 — "경기 파크골프장 78곳 중 홀 수 기준 12번째" */
 export function rankSentence(place: Place, rank: MetricRank): string {
   const label = CATEGORIES[place.category].label;

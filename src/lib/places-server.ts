@@ -7,7 +7,7 @@ const PAGE = 1000;
 
 /** 상세(단건) select — 긴 본문 포함 */
 const SELECT_COLS =
-  "id,category,name,slug,region,city,address,lat,lng,phone,reserve_url,description,attributes";
+  "id,category,name,slug,region,city,address,lat,lng,phone,reserve_url,description,attributes,updated_at";
 
 /**
  * 목록(전체) select — description(산 소개 등 긴 본문) 제외.
@@ -57,6 +57,7 @@ function rowToPlace(r: Row): Place {
     phone: r.phone,
     reserveUrl: r.reserve_url,
     description: r.description ?? null,
+    updatedAt: r.updated_at ?? null,
     attributes: r.attributes ?? {},
   };
 }
@@ -402,6 +403,7 @@ type Row = {
   reserve_url: string | null;
   /** 목록 select 에는 포함되지 않음(undefined) */
   description?: string | null;
+  updated_at?: string | null;
   attributes: Place["attributes"] | null;
 };
 

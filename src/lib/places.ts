@@ -64,6 +64,8 @@ export type Place = {
   reserveUrl: string | null;
   /** 상세 설명(등산: 산 소개 본문) */
   description: string | null;
+  /** 자료 최종 갱신 시각(ISO). 상세 조회에서만 채워진다 */
+  updatedAt?: string | null;
   attributes: PlaceAttributes;
 };
 
