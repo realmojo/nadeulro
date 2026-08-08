@@ -16,15 +16,12 @@ export type NavItem = {
   title: string;
   href: string;
   description: string;
+  /** secondary 는 좁은 화면(lg)에서 헤더에 숨긴다 — 푸터·하단탭에서 접근 가능 */
+  priority?: "primary" | "secondary";
 };
 
 /** 주 내비게이션 (단순 1단계) */
 export const mainNav: NavItem[] = [
-  {
-    title: "나들이 지도",
-    href: "/map",
-    description: "전국 3,000여 곳을 지도 한 장에서.",
-  },
   {
     title: "나들이 코스",
     href: "/course",
@@ -59,6 +56,7 @@ export const mainNav: NavItem[] = [
     title: "수목원",
     href: "/arboretum",
     description: "전국 수목원·식물원·정원을 지도에서.",
+    priority: "secondary",
   },
   {
     title: "나들이 도구",
@@ -69,10 +67,12 @@ export const mainNav: NavItem[] = [
     title: "블로그",
     href: "/blog",
     description: "파크골프·온천·수영·등산 나들이 이야기.",
+    priority: "secondary",
   },
   {
     title: "이용 가이드",
     href: "/guide",
     description: "지도로 나들이 스팟 찾는 법 총정리.",
+    priority: "secondary",
   },
 ];

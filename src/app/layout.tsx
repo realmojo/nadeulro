@@ -102,7 +102,7 @@ export default function RootLayout({
           본문 바로가기
         </a>
         <SiteHeader />
-        <main id="main" className="flex-1 pb-20 md:pb-0">
+        <main id="main" className="flex-1 pb-20 lg:pb-0">
           {children}
         </main>
         <SiteFooter />

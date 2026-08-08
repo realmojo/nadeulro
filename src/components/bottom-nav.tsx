@@ -54,7 +54,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="하단 메뉴"
-      className="fixed inset-x-0 bottom-0 z-[60] border-t bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/90 md:hidden"
+      className="fixed inset-x-0 bottom-0 z-[60] border-t bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/90 lg:hidden"
     >
       <ul className="grid h-16 grid-cols-5 pb-safe">
         {tabs.map((t) => (
