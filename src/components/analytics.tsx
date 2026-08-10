@@ -6,7 +6,7 @@ import Script from "next/script";
  */
 const GA_ID = "G-DFE2BJRLF0";
 const NAVER_WA = "19d45054f3b14c0";
-const ADSENSE_CLIENT = "ca-pub-2559478993943853";
+const ADSENSE_CLIENT = "ca-pub-9745992677443303";
 
 export function Analytics() {
   return (
