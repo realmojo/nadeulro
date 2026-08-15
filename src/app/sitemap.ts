@@ -5,8 +5,8 @@ import { fetchAllPublished } from "@/lib/blog-server";
 import { coursePath } from "@/lib/course";
 import { fetchCourses } from "@/lib/course-server";
 import { nearPath } from "@/lib/near";
-import { isIndexablePlace, placeDetailPath, regionPath } from "@/lib/places";
-import { fetchSitemapPlaces } from "@/lib/places-server";
+import { placeDetailPath, regionPath } from "@/lib/places";
+import { fetchPlaces } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
 import { TOOLS, TOOLS_INDEX } from "@/lib/tools";
 
@@ -60,14 +60,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const regionEntries: MetadataRoute.Sitemap = [];
   const cityEntries: MetadataRoute.Sitemap = [];
   try {
-    // 색인 판정이 본문 길이를 보므로 description 을 포함한 목록을 쓴다
-    const places = await fetchSitemapPlaces();
-    // 정보가 불완전하거나 본문이 stub 인 페이지는 제외 — 색인 품질 관리
-    placeEntries = places.filter(isIndexablePlace).map((p) => ({
+    const { places } = await fetchPlaces();
+    // 게시된 장소는 모두 수록한다 (slug 없는 행만 제외 — URL 이 깨진다)
+    placeEntries = places
+      .filter((p) => Boolean(p.slug))
+      .map((p) => ({
       url: `${siteConfig.url}${placeDetailPath(p.category, p.slug)}`,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    }));
+        changeFrequency: "monthly",
+        priority: 0.6,
+      }));
 
     // (카테고리 × 존재하는 지역) 조합만
     const seen = new Set<string>();

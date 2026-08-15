@@ -261,30 +261,6 @@ export function kakaoDirectionsUrl(p: Place): string {
  * 온천 데이터의 reserve_url 은 전부 onchun.com(제3자 정보 디렉터리)이라
  * '예약·홈페이지'로 안내하면 오해를 주고 트래픽이 유출되므로 노출하지 않는다.
  */
-/** 소개 본문이 '한 문단'이라 할 만한 최소 길이 (등산·수목원 원문 기준) */
-const MIN_ARTICLE_CHARS = 80;
-
-/**
- * 색인(index) 가치가 있는 상세 페이지인지 — 저품질 대량 페이지의 색인을 줄여
- * 사이트 전체 품질을 높인다(애드센스/SEO).
- *
- * - 등산·수목원: 원문 소개가 실제로 한 문단 이상 있을 때만. 이름·높이만 있고
- *   본문이 한 줄뿐인 stub 은 템플릿 문구밖에 남지 않아 제외한다.
- * - 시설(파크골프·온천·수영): 연락처가 있고, 좌표가 있어 주변 반경·거리 같은
- *   계산된 고유 정보를 만들 수 있는 곳만.
- *
- * ⚠️ description 을 보므로 **본문을 포함해 조회한 Place** 를 넘겨야 한다.
- *    (fetchPlaces() 의 목록 페이로드는 description 이 비어 있음 →
- *     사이트맵은 fetchSitemapPlaces() 를 쓸 것)
- */
-export function isIndexablePlace(p: Place): boolean {
-  const hasCoords = p.lat != null && p.lng != null;
-  if (p.category === "hiking" || p.category === "arboretum") {
-    return (p.description ?? "").trim().length >= MIN_ARTICLE_CHARS;
-  }
-  return Boolean(p.phone && p.phone.trim()) && hasCoords;
-}
-
 /** 어린이·유아 전용 시설로 읽히는 이름 (수영장 983곳 중 약 23%) */
 const KIDS_ONLY = /어린이|키즈|유아|아기|베이비|kids|유치원|어린이집|스윔스쿨/i;
 

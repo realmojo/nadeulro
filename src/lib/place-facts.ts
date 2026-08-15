@@ -206,7 +206,7 @@ export function rankSentence(place: Place, rank: MetricRank): string {
 
 /**
  * 이 페이지가 '계산된 고유 정보'를 실제로 갖는지.
- * 색인 판단(isIndexablePlace)과 별개로, 본문 렌더 여부를 정한다.
+ * 본문에 계산 섹션을 그릴지 여부를 정한다.
  */
 export function hasComputedFacts(
   radius: RadiusStats | null,

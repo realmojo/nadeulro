@@ -327,28 +327,6 @@ export async function fetchByCategoryRegion(
   return ((data ?? []) as Row[]).map(rowToPlace);
 }
 
-/**
- * 사이트맵/색인 판정용 전체 목록 — isIndexablePlace() 가 본문 길이를 보므로
- * description 을 포함해 조회한다(하루 1회 ISR 이라 전송량 비용을 감수).
- * 본문은 판정 직후 길이만 남기고 버려 메모리에 쌓이지 않게 한다.
- */
-export async function fetchSitemapPlaces(): Promise<Place[]> {
-  const supabase = makeClient();
-  const out: Place[] = [];
-  for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase
-      .from("nadeulro_places")
-      .select(SELECT_COLS)
-      .order("id", { ascending: true })
-      .range(from, from + PAGE - 1);
-    if (error) throw new Error(`사이트맵 조회 실패: ${error.message}`);
-    const rows = (data ?? []) as Row[];
-    out.push(...rows.map(rowToPlace));
-    if (rows.length < PAGE) break;
-  }
-  return out;
-}
-
 /** 시군구 허브용: 한 시군구의 모든 카테고리 장소 */
 export async function fetchCityPlaces(
   region: string,
