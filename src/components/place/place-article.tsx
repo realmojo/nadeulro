@@ -48,6 +48,8 @@ import {
 } from "@/lib/place-facts";
 import { DESCENT_BUFFER_MIN, daylightExtremes, monthlySun } from "@/lib/sun";
 import type { RelatedPlaces } from "@/lib/places-server";
+import { AdUnit } from "@/components/ad-unit";
+import { adsense } from "@/lib/site";
 
 /**
  * 상세 페이지 본문 — 가이드형 롱폼 아티클(서버 렌더, SEO/AEO 최적화).
@@ -107,6 +109,9 @@ export function PlaceArticle({
 
   return (
     <article className="mx-auto w-full max-w-2xl px-4 py-4 md:py-8">
+      {/* 광고: 콘텐츠 최상단 */}
+      <AdUnit slot={adsense.slots.top} className="mb-4" />
+
       {/* 상단 내비 */}
       <div className="flex items-center gap-2">
         <Link
@@ -148,6 +153,9 @@ export function PlaceArticle({
           {a.subtitle}
         </p>
       ) : null}
+      {/* 광고: 제목 아래 */}
+      <AdUnit slot={adsense.slots.belowTitle} className="mt-4" />
+
       {/*
         파크골프·온천·수영장의 description 은 "○○에 위치한 수영장입니다" 식
         자동생성 문장이라 바로 아래 시설 정보 표와 내용이 겹친다. 분량만 늘리고
@@ -590,6 +598,9 @@ export function PlaceArticle({
           {disclaimer(place)}
         </p>
       </section>
+
+      {/* 광고: 본문 하단 */}
+      <AdUnit slot={adsense.slots.bottom} className="mt-8" />
     </article>
   );
 }

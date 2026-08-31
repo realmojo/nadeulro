@@ -1,12 +1,14 @@
 import Script from "next/script";
 
+import { adsense } from "@/lib/site";
+
 /**
  * 웹 분석 스크립트: Google Analytics(gtag) + 네이버 웹마스터(wcs).
  * next/script `afterInteractive`로 로드해 초기 렌더를 막지 않는다.
  */
 const GA_ID = "G-DFE2BJRLF0";
 const NAVER_WA = "19d45054f3b14c0";
-const ADSENSE_CLIENT = "ca-pub-9130836798889522";
+const ADSENSE_CLIENT = adsense.client;
 
 export function Analytics() {
   return (

@@ -12,6 +12,19 @@ export const siteConfig = {
   contactEmail: "tedevspace@gmail.com",
 } as const;
 
+/** Google AdSense — 게시자 ID와 상세 페이지 반응형 광고 슬롯 */
+export const adsense = {
+  client: "ca-pub-9130836798889522",
+  slots: {
+    /** 나들로(최상단) — 콘텐츠 최상단 */
+    top: "2453214968",
+    /** 나들로(제목아래) — 제목 바로 아래 */
+    belowTitle: "7513969957",
+    /** 나들로(하단) — 본문 하단 */
+    bottom: "3126685730",
+  },
+} as const;
+
 export type NavItem = {
   title: string;
   href: string;

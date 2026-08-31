@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-import { siteConfig } from "@/lib/site";
+import { AdUnit } from "@/components/ad-unit";
+import { adsense, siteConfig } from "@/lib/site";
 import { TOOLS_INDEX, type Tool } from "@/lib/tools";
 
 /** 도구 페이지 공용 메타데이터 */
@@ -101,6 +102,9 @@ export function ToolShell({
       />
 
       <article className="mx-auto w-full max-w-2xl px-4 py-4 md:py-8">
+        {/* 광고: 콘텐츠 최상단 */}
+        <AdUnit slot={adsense.slots.top} className="mb-4" />
+
         <div className="flex items-center gap-2">
           <Link
             href={TOOLS_INDEX.path}
@@ -121,9 +125,15 @@ export function ToolShell({
           {tool.blurb}
         </p>
 
+        {/* 광고: 제목 아래 */}
+        <AdUnit slot={adsense.slots.belowTitle} className="mt-4" />
+
         {children}
 
         {footer}
+
+        {/* 광고: 본문 하단 */}
+        <AdUnit slot={adsense.slots.bottom} className="mt-8" />
       </article>
     </>
   );

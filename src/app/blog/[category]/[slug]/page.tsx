@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, MapPinned } from "lucide-react";
 import { marked } from "marked";
 
+import { AdUnit } from "@/components/ad-unit";
+import { adsense } from "@/lib/site";
 import { PostCard } from "@/components/blog/post-card";
 import {
   blogCategoryLabel,
@@ -143,6 +145,9 @@ export default async function BlogPostPage({ params }: Props) {
       ) : null}
 
       <article className="mx-auto w-full max-w-2xl px-4 py-6 md:py-10">
+        {/* 광고: 콘텐츠 최상단 */}
+        <AdUnit slot={adsense.slots.top} className="mb-4" />
+
         {/* 브레드크럼 (가시) */}
         <nav className="flex items-center gap-1.5 text-sm text-muted-foreground" aria-label="위치">
           <Link href="/blog" className="hover:text-foreground">블로그</Link>
@@ -172,6 +177,9 @@ export default async function BlogPostPage({ params }: Props) {
             {post.excerpt}
           </p>
         ) : null}
+
+        {/* 광고: 제목 아래 */}
+        <AdUnit slot={adsense.slots.belowTitle} className="mt-4" />
 
         {post.coverImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -247,6 +255,9 @@ export default async function BlogPostPage({ params }: Props) {
           <ArrowLeft className="size-4" />
           {label} 글 더 보기
         </Link>
+
+        {/* 광고: 본문 하단 */}
+        <AdUnit slot={adsense.slots.bottom} className="mt-8" />
       </article>
 
       {related.length ? (

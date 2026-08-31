@@ -69,6 +69,11 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
   },
+  verification: {
+    other: {
+      "naver-site-verification": "128e468f4cee291f4ef2213b46dc005b134e8a5e",
+    },
+  },
 };
 
 export const viewport: Viewport = {

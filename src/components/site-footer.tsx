@@ -99,13 +99,7 @@ export function SiteFooter() {
         {/* 운영 정보 · 저작권 */}
         <div className="space-y-2 text-muted-foreground">
           <p>
-            운영 : {siteConfig.name}({siteConfig.nameRomanized}) ｜ 문의 :{" "}
-            <a
-              href={`mailto:${siteConfig.contactEmail}`}
-              className="hover:underline"
-            >
-              {siteConfig.contactEmail}
-            </a>
+            운영 : {siteConfig.name}({siteConfig.nameRomanized})
           </p>
           <p>
             © {new Date().getFullYear()} {siteConfig.name}의 모든 콘텐츠는
