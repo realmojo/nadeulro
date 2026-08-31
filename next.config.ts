@@ -7,24 +7,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-
-  // 구 도메인(nadeulro.com)으로 들어온 모든 요청을 새 도메인으로 301 이전.
-  async redirects() {
-    return [
-      {
-        source: "/:path*",
-        has: [{ type: "host" as const, value: "nadeulro.com" }],
-        destination: "https://nadeulro.keywordegg.com/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "host" as const, value: "www.nadeulro.com" }],
-        destination: "https://nadeulro.keywordegg.com/:path*",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;
