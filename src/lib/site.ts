@@ -5,7 +5,7 @@
 export const siteConfig = {
   name: "나들로",
   nameRomanized: "nadeulro",
-  url: "https://nadeulro.com",
+  url: "https://nadeulro.keywordegg.com",
   tagline: "지도 한 장이면, 오늘 나들이 준비 끝",
   description:
     "전국 파크골프장·온천·수영장·등산 명소의 위치와 정보를 카카오맵 기반 지도 한 장으로 보여주는 나들이 정보 사이트.",

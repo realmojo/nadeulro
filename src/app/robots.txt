@@ -3,4 +3,4 @@
 User-Agent: *
 Allow: /
 
-Sitemap: https://nadeulro.com/sitemap.xml
+Sitemap: https://nadeulro.keywordegg.com/sitemap.xml
