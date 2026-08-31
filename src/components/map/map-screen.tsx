@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 
+import { AdUnit } from "@/components/ad-unit";
+import { adsense } from "@/lib/site";
 import { loadKakaoMap } from "@/lib/kakao-map";
 import type {
   KClusterer,
@@ -76,9 +78,12 @@ function loadPlacesOnce(): Promise<PlacesData> {
 export function MapScreen({
   initialCategory,
   sideContent,
+  showAds = false,
 }: {
   initialCategory: Filter;
   sideContent?: React.ReactNode;
+  /** 목록에 애드센스 광고 2개(중간·하단)를 넣는다 — 카테고리 1depth 전용 */
+  showAds?: boolean;
 }) {
   /* ---------- 데이터 ---------- */
   const [places, setPlaces] = useState<Place[] | null>(null);
@@ -626,6 +631,7 @@ export function MapScreen({
               loading={loading}
               dataError={dataError}
               onSelect={selectPlace}
+              showAds={showAds}
             />
           </>
         )}
@@ -797,6 +803,7 @@ export function MapScreen({
                   loading={loading}
                   dataError={dataError}
                   onSelect={selectPlace}
+                  showAds={showAds}
                 />
               )}
             </>
@@ -965,11 +972,13 @@ function PlaceList({
   loading,
   dataError,
   onSelect,
+  showAds = false,
 }: {
   places: Place[];
   loading: boolean;
   dataError: boolean;
   onSelect: (p: Place) => void;
+  showAds?: boolean;
 }) {
   if (loading) {
     return (
@@ -996,11 +1005,26 @@ function PlaceList({
       </p>
     );
   }
+  // 목록 중간(3번째 뒤)과 맨 아래에 반응형 광고 1개씩 (카테고리 1depth 페이지)
+  const AD_AFTER = 3;
   return (
     <ul className="panel-scroll flex-1 divide-y overflow-y-auto pb-safe">
-      {places.map((p) => (
+      {places.slice(0, AD_AFTER).map((p) => (
         <PlaceRow key={p.id} place={p} onSelect={onSelect} />
       ))}
+      {showAds && places.length > AD_AFTER ? (
+        <li key="ad-top" className="px-4 py-3">
+          <AdUnit slot={adsense.slots.top} />
+        </li>
+      ) : null}
+      {places.slice(AD_AFTER).map((p) => (
+        <PlaceRow key={p.id} place={p} onSelect={onSelect} />
+      ))}
+      {showAds ? (
+        <li key="ad-bottom" className="px-4 py-3">
+          <AdUnit slot={adsense.slots.bottom} />
+        </li>
+      ) : null}
     </ul>
   );
 }

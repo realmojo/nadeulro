@@ -260,7 +260,7 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <MapScreen initialCategory={category} sideContent={sidePanel} />
+      <MapScreen initialCategory={category} sideContent={sidePanel} showAds />
 
       {/* 검색엔진·스크린리더용 보조 콘텐츠 (지도 뒤에 위치) */}
       <section className="sr-only">
