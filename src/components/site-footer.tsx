@@ -14,8 +14,13 @@ export function SiteFooter() {
     { title: "수영장", href: "/swim" },
     { title: "등산", href: "/hiking" },
     { title: "나들이 코스", href: "/course" },
+    { title: "가을 단풍 특집", href: "/autumn" },
     { title: "100대 명산", href: "/mountains-100" },
+    { title: "낮은 산 (초보)", href: "/hiking-easy" },
     { title: "대형 파크골프장", href: "/parkgolf-large" },
+    { title: "공공 파크골프장", href: "/parkgolf-public" },
+    { title: "뜨거운 원탕 온천", href: "/hotspring-hot" },
+    { title: "유황온천", href: "/hotspring-sulfur" },
     { title: "블로그", href: "/blog" },
     { title: "이용 가이드", href: "/guide" },
   ];

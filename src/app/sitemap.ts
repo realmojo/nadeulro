@@ -5,7 +5,7 @@ import { fetchAllPublished } from "@/lib/blog-server";
 import { coursePath } from "@/lib/course";
 import { fetchCourses } from "@/lib/course-server";
 import { nearPath } from "@/lib/near";
-import { placeDetailPath, regionPath } from "@/lib/places";
+import { cityPath, placeDetailPath, regionPath } from "@/lib/places";
 import { fetchPlaces } from "@/lib/places-server";
 import { siteConfig } from "@/lib/site";
 import { TOOLS, TOOLS_INDEX } from "@/lib/tools";
@@ -24,6 +24,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/course",
     "/mountains-100",
     "/parkgolf-large",
+    "/parkgolf-public",
+    "/hotspring-hot",
+    "/hotspring-sulfur",
+    "/hiking-easy",
+    "/autumn",
     "/arboretum",
     "/near",
     TOOLS_INDEX.path,
@@ -38,6 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/blog/hotspring",
     "/blog/swim",
     "/blog/hiking",
+    "/blog/arboretum",
   ];
 
   const lowPriority = ["/privacy", "/terms", "/contact"];
@@ -74,6 +80,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const seen = new Set<string>();
     // 시군구 허브는 카테고리가 2종 이상일 때만 (1종이면 지역 페이지와 중복)
     const cityCats = new Map<string, Set<string>>();
+    // 카테고리별 시군구 페이지 (예: /parkgolf/region/경기/고양시)
+    const catCitySeen = new Set<string>();
     for (const p of places) {
       if (!p.region) continue;
       const key = `${p.category}:${p.region}`;
@@ -89,6 +97,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const ck = `${p.region}|${p.city}`;
         if (!cityCats.has(ck)) cityCats.set(ck, new Set());
         cityCats.get(ck)!.add(p.category);
+
+        const cck = `${p.category}:${ck}`;
+        if (!catCitySeen.has(cck)) {
+          catCitySeen.add(cck);
+          cityEntries.push({
+            url: `${siteConfig.url}${cityPath(p.category, p.region, p.city)}`,
+            changeFrequency: "weekly",
+            priority: 0.7,
+          });
+        }
       }
     }
 

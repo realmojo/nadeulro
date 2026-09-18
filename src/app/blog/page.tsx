@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default async function BlogHome() {
   let posts = [] as Awaited<ReturnType<typeof fetchPosts>>;
-  let counts = { parkgolf: 0, hotspring: 0, swim: 0, hiking: 0 };
+  let counts = { parkgolf: 0, hotspring: 0, swim: 0, hiking: 0, arboretum: 0 };
   try {
     [posts, counts] = await Promise.all([fetchPosts({ limit: 30 }), blogCounts()]);
   } catch {

@@ -47,8 +47,10 @@ ${catLines}
 ## 주요 페이지
 - [나들이 지도(전체)](${u}/map): 지도에서 카테고리·지역·검색으로 탐색
 - [이용 가이드](${u}/guide): 사이트 사용법
-- 카테고리 페이지: ${u}/parkgolf, ${u}/hotspring, ${u}/swim, ${u}/hiking
+- 카테고리 페이지: ${u}/parkgolf, ${u}/hotspring, ${u}/swim, ${u}/hiking, ${u}/arboretum
 - 지역별 페이지: ${u}/{카테고리}/region/{시도} (예: ${u}/parkgolf/region/서울)
+- 시군구 페이지: ${u}/{카테고리}/region/{시도}/{시군구} (예: ${u}/parkgolf/region/경기/고양시)
+- 테마 모음: ${u}/mountains-100 (100대 명산), ${u}/hiking-easy (낮은 산), ${u}/parkgolf-large (대형 구장), ${u}/parkgolf-public (공공 구장), ${u}/hotspring-hot (뜨거운 원탕), ${u}/hotspring-sulfur (유황온천), ${u}/autumn (가을 특집)
 - 장소 상세: ${u}/{카테고리}/{장소명} — 위치·시설 정보, 이용 안내, 방문 체크리스트, FAQ 포함
 
 ## 인용 시 유의

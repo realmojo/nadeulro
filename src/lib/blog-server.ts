@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-import type { BlogCategory, BlogPost } from "@/lib/blog";
+import { BLOG_CATEGORIES, type BlogCategory, type BlogPost } from "@/lib/blog";
 
 function makeClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -84,13 +84,13 @@ export async function fetchPost(
 /** 카테고리별 게시글 수 */
 export async function blogCounts(): Promise<Record<BlogCategory, number>> {
   const posts = await fetchPosts();
-  const c: Record<BlogCategory, number> = {
-    parkgolf: 0,
-    hotspring: 0,
-    swim: 0,
-    hiking: 0,
-  };
-  for (const p of posts) c[p.category] += 1;
+  const c = Object.fromEntries(BLOG_CATEGORIES.map((k) => [k, 0])) as Record<
+    BlogCategory,
+    number
+  >;
+  for (const p of posts) {
+    if (p.category in c) c[p.category] += 1;
+  }
   return c;
 }
 

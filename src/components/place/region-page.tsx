@@ -6,6 +6,7 @@ import { ArrowLeft, MapPin, MapPinned } from "lucide-react";
 import {
   CATEGORIES,
   REGION_ORDER,
+  cityPath,
   placeDetailPath,
   regionPath,
   type Place,
@@ -158,7 +159,16 @@ export async function RegionPage({
             <section key={city}>
               <h2 className="font-display flex items-center gap-1.5 text-xl font-bold">
                 <MapPin className="size-5 text-muted-foreground" />
-                {city}
+                {city === "기타" ? (
+                  city
+                ) : (
+                  <Link
+                    href={cityPath(category, region, city)}
+                    className="hover:text-primary hover:underline"
+                  >
+                    {city} {meta.label}
+                  </Link>
+                )}
                 <span className="text-base font-medium text-muted-foreground">
                   {list.length}곳
                 </span>

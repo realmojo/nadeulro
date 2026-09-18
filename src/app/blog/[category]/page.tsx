@@ -5,11 +5,11 @@ import { ArrowLeft, MapPinned } from "lucide-react";
 
 import { PostCard, BlogCategoryChips } from "@/components/blog/post-card";
 import {
+  BLOG_CATEGORIES,
   BLOG_CATEGORY_SEO,
   blogCategoryLabel,
   blogCategoryPath,
   isBlogCategory,
-  type BlogCategory,
 } from "@/lib/blog";
 import { fetchPosts, blogCounts } from "@/lib/blog-server";
 import { CATEGORIES } from "@/lib/places";
@@ -21,9 +21,7 @@ export const dynamicParams = false;
 type Props = { params: Promise<{ category: string }> };
 
 export function generateStaticParams() {
-  return (["parkgolf", "hotspring", "swim", "hiking"] as BlogCategory[]).map(
-    (category) => ({ category }),
-  );
+  return BLOG_CATEGORIES.map((category) => ({ category }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -48,7 +46,7 @@ export default async function BlogCategoryPage({ params }: Props) {
   const meta = CATEGORIES[category];
 
   let posts = [] as Awaited<ReturnType<typeof fetchPosts>>;
-  let counts = { parkgolf: 0, hotspring: 0, swim: 0, hiking: 0 };
+  let counts = { parkgolf: 0, hotspring: 0, swim: 0, hiking: 0, arboretum: 0 };
   try {
     [posts, counts] = await Promise.all([
       fetchPosts({ category }),

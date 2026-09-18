@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import {
+  BLOG_CATEGORIES,
   blogCategoryLabel,
   blogCategoryPath,
   blogCategoryColor,
@@ -72,12 +73,7 @@ export function BlogCategoryChips({
   active?: BlogPost["category"];
   counts: Record<BlogPost["category"], number>;
 }) {
-  const cats: BlogPost["category"][] = [
-    "parkgolf",
-    "hotspring",
-    "swim",
-    "hiking",
-  ];
+  const cats: BlogPost["category"][] = BLOG_CATEGORIES;
   return (
     <div className="flex flex-wrap gap-2">
       <Link

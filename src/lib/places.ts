@@ -251,6 +251,15 @@ export function regionPath(category: PlaceCategory, region: string): string {
   return `${CATEGORIES[category].path}/region/${encodeURIComponent(region)}`;
 }
 
+/** 시군구 페이지 경로 (예: /parkgolf/region/경기/고양시) */
+export function cityPath(
+  category: PlaceCategory,
+  region: string,
+  city: string,
+): string {
+  return `${regionPath(category, region)}/${encodeURIComponent(city)}`;
+}
+
 /** 카카오맵 길찾기 링크 */
 export function kakaoDirectionsUrl(p: Place): string {
   return `https://map.kakao.com/link/to/${encodeURIComponent(p.name)},${p.lat},${p.lng}`;

@@ -3,14 +3,21 @@
  */
 import { CATEGORIES, type PlaceCategory } from "@/lib/places";
 
-// 블로그는 글이 존재하는 4종만 다룬다(수목원 등 신규 장소 카테고리는 제외).
-export type BlogCategory = Exclude<PlaceCategory, "arboretum">;
+// 블로그 카테고리 = 장소 카테고리 전체 (토픽 클러스터).
+export type BlogCategory = PlaceCategory;
 
-/** 블로그를 가진 카테고리인지(수목원 등 신규 장소 카테고리 제외). 문자열 라우트 파라미터도 검증. */
+/** 블로그 카테고리 목록 — 목록·정적 생성에서 공용 */
+export const BLOG_CATEGORIES: BlogCategory[] = [
+  "parkgolf",
+  "hotspring",
+  "swim",
+  "hiking",
+  "arboretum",
+];
+
+/** 블로그를 가진 카테고리인지. 문자열 라우트 파라미터도 검증. */
 export function isBlogCategory(c: string | null | undefined): c is BlogCategory {
-  return (
-    c === "parkgolf" || c === "hotspring" || c === "swim" || c === "hiking"
-  );
+  return (BLOG_CATEGORIES as string[]).includes(c ?? "");
 }
 
 export type BlogPost = {
@@ -71,5 +78,10 @@ export const BLOG_CATEGORY_SEO: Record<
     title: "등산 코스·초보 가이드",
     description:
       "초보 등산 코스와 준비물, 계절별 산행 팁, 전국 명산 이야기까지. 가볍게 오르는 산부터 이름난 명산까지 안내합니다.",
+  },
+  arboretum: {
+    title: "수목원·정원 나들이 가이드",
+    description:
+      "계절별 수목원 볼거리와 산책 팁, 전국 식물원·정원 이야기까지. 숲길을 천천히 걷는 나들이를 위한 정보를 모았습니다.",
   },
 };

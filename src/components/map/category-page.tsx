@@ -85,6 +85,25 @@ const SEO: Record<
   },
 };
 
+/** 카테고리별 테마(큐레이션) 링크 — 우측 패널 노출용 */
+const THEME_LINKS: Record<PlaceCategory, Array<{ href: string; label: string }>> = {
+  parkgolf: [
+    { href: "/parkgolf-large", label: "대형 구장 (36홀+)" },
+    { href: "/parkgolf-public", label: "공공 운영 구장" },
+  ],
+  hotspring: [
+    { href: "/hotspring-hot", label: "뜨거운 원탕 (40°C+)" },
+    { href: "/hotspring-sulfur", label: "유황온천" },
+  ],
+  swim: [],
+  hiking: [
+    { href: "/mountains-100", label: "100대 명산" },
+    { href: "/hiking-easy", label: "낮은 산 (초보)" },
+    { href: "/autumn", label: "가을 단풍 특집" },
+  ],
+  arboretum: [{ href: "/autumn", label: "가을 단풍 특집" }],
+};
+
 /** 카테고리 페이지 메타데이터 (실제 장소 수 포함) */
 export async function categoryMetadata(cat: PlaceCategory): Promise<Metadata> {
   const meta = CATEGORIES[cat];
@@ -168,6 +187,23 @@ export async function CategoryMapPage({ category }: { category: PlaceCategory })
               >
                 {r}
                 <span className="text-muted-foreground">{n}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {THEME_LINKS[category].length > 0 ? (
+        <section className="mt-6">
+          <h3 className="text-sm font-bold text-foreground/80">테마별 모음</h3>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {THEME_LINKS[category].map((t) => (
+              <Link
+                key={t.href}
+                href={t.href}
+                className="inline-flex items-center rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground/80 hover:bg-muted"
+              >
+                {t.label}
               </Link>
             ))}
           </div>
